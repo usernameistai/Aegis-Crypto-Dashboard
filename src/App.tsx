@@ -97,12 +97,13 @@ const App: FC<CryptoDataProps> = () => {
       ? priceData.prices.map(([timestamp, price]) => ({ // : [number, number]
         date: new Date(timestamp).toISOString(),
         price: price,
-      }))
+        }))
       : [];
   }, [priceData]);
 
   const filteredCoins = useMemo(() => {
     if (!search) return [];
+
     return coins.filter((c) => c.name.toLowerCase().includes(search.toLowerCase()));
   }, [search, coins]);
 
@@ -121,7 +122,7 @@ const App: FC<CryptoDataProps> = () => {
     window.scrollTo({
       top: 0,
       behavior: "smooth",
-    })
+    });
   };
 
   return (
