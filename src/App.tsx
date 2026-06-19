@@ -172,7 +172,7 @@ const App: FC<CryptoDataProps> = () => {
               md:static md:col-span-3 lg:col-span-2 md:translate-x-0 peer-checked:left-0 md:block
                bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 shadow-xl 
                shadow-[#808080]/70 shrink-0 p-2 md:p-4 m-2 md:m-4 rounded-lg
-              overflow-y-auto overflow-scroll"
+              overflow-y-auto touch-pan-y"
             > { /*  added overflow-y-auto overflow-scroll */ }
               <div className="relative pb-4 mb-4 border-b border-mist-900/20 uppercase text-left font-semibold">
                 <h2 className="text-slate-700/80 text-sm md:text-base">Crypto // Assets</h2>
