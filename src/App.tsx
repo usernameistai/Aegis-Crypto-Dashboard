@@ -115,6 +115,13 @@ const App: FC<CryptoDataProps> = () => {
     }));
 
     setSearch(''); 
+
+    if (menuRef.current) menuRef.current.checked = false;
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    })
   };
 
   return (
