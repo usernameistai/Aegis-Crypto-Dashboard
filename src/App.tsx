@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState,  } from "react";
-import type { FC, MouseEvent } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
+import type { FC } from "react";
 import axios from "axios";
 import type { CryptoDataProps, CryptoDataHistory, PriceResponse } from "./types/cryptoDataTypes";
 import CryptoChart from "./components/CryptoChart";
+import { LuSquareMenu } from "react-icons/lu";
 
 const CryptoField = ({ label, value, subMetric }: { label: string, value: string, subMetric?: number }) => (
   <div tabIndex={0} className="border-b-2 border-r-2 border-neutral-200/70 shadow-md p-2.5 md:p-4 rounded-md transition-[background-color,transform,box-shadow] duration-300 ease-in-out hover:bg-white/30 hover:scale-115 focus:bg-white/30 focus:scale-115">
@@ -33,6 +34,7 @@ const App: FC<CryptoDataProps> = () => {
   const [params, setParams] = useState<CryptoDataHistory>({ id: `bitcoin`, currency: 'gbp', days: 90 });
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState('');
+  const menuRef = useRef<HTMLInputElement>(null);
 
   const url1 = useMemo(() => `https://api.coingecko.com/api/v3/coins/markets?vs_currency=gbp&order=market_cap_desc&per_page=250&page=1`, []);
   const url2 = useMemo(() =>`https://api.coingecko.com/api/v3/coins/${params.id}/market_chart?vs_currency=${params.currency}&days=${params.days}`, [params]);
@@ -98,8 +100,6 @@ const App: FC<CryptoDataProps> = () => {
       : [];
   }, [priceData]);
 
-  const handleSearch = (e: MouseEvent<HTMLButtonElement>) => e.preventDefault();
-
   const filteredCoins = useMemo(() => {
     if (!search) return [];
     return coins.filter((c) => c.name.toLowerCase().includes(search.toLowerCase()));
@@ -111,6 +111,7 @@ const App: FC<CryptoDataProps> = () => {
     <>
       <div className="data-shield">
         <div className="min-h-screen w-full bg-neutral-200/20 antialiased overflow-x-hidden">
+
           {isLoading && (
             <div className="fixed inset-0 w-screen h-screen bg-neutral-900/80 flex items-center justify-center z-9999 backdrop-blur-sm text-white">
               <p className="animate-pulse font-mono tracking-[0.3em] uppercase">
@@ -137,12 +138,26 @@ const App: FC<CryptoDataProps> = () => {
             ))}
           </div>
           
-          <h1 className="top-0 my-3 text-center text-[#808080] text-xl md:text-4xl uppercase font-black tracking-[0.225em]">
+          <h1 className="top-0 mt-3 mb-10 md:my-3 text-center text-[#808080] text-xl md:text-4xl uppercase font-black tracking-[0.225em]">
             Aegis Crypto Dashboard
           </h1>
 
-          <div className="grid grid-cols-12 min-h-screen">
-            <aside className="col-span-4 md:col-span-3 lg:col-span-2 bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 shadow-xl shadow-[#808080]/70 shrink-0 p-2 md:p-4 m-2 md:m-4 rounded-lg">
+          <div className="grid grid-cols-12 ">
+            <input 
+              type="checkbox" 
+              id="menu-toggle" 
+              className="peer hidden"
+              ref={menuRef}
+            />
+            <label 
+              htmlFor="menu-toggle" 
+              className="touch-manipulation md:hidden p-2 fixed top-18 left-2 z-50 bg-neutral900/50 backdrop-blur-sm border border-white/10 text-teal-500 rounded-lg cursor-pointer flex items-center gap-2"
+            >
+              <div><LuSquareMenu size={24}/></div> 
+              <div className="ml-1 font-mono font-semibold uppercase tracking-wider">Crypto Sidebar</div>
+            </label>
+
+            <aside className="fixed inset-0 z-40 top-25 md:top-0 transform transition-transform duration-300 translate-x-full peer-checked:translate-x-0 md:static md:col-span-3 lg:col-span-2 md:translate-x-0 peer-checked:left-0 md:block bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 shadow-xl shadow-[#808080]/70 shrink-0 p-2 md:p-4 m-2 md:m-4 rounded-lg">
               <div className="relative pb-4 mb-4 border-b border-mist-900/20 uppercase text-left font-semibold">
                 <h2 className="text-slate-700/80 text-sm md:text-base">Crypto // Assets</h2>
               </div>
@@ -150,11 +165,13 @@ const App: FC<CryptoDataProps> = () => {
               <div className="flex flex-col gap-y-2 mt-4 text-slate-700/80">
                 {coins.slice(0, 10).map((c) => (
                   <button 
-                    key={c.id} 
+                    key={c.id}
                     className="uppercase my-1 px-0.5 md:px-4 py-2 text-left text-[12px] md:text-base font-semibold border border-mist-400/10 rounded-lg hover:text-white hover:bg-neutral-700/20 hover:border-mist-700/50"
                     onClick={() => {
                       setSelectedCoin(c);
                       setParams((prev) => ({ ...prev, id: c.id }));
+
+                      if (menuRef.current) menuRef.current.checked = false;
                     }}  
                   >
                     <h2>{c.id}</h2>
@@ -162,7 +179,14 @@ const App: FC<CryptoDataProps> = () => {
                 ))}
               </div>
               
-              <label htmlFor="search" className="shadowy">
+              <form
+                className="shadowy relative"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  console.log("Searching for:", search);
+                }}
+              >
+                {/* <label htmlFor="search" className="shadowy"> */}
                 <input 
                   type="search"
                   value={search}
@@ -173,29 +197,37 @@ const App: FC<CryptoDataProps> = () => {
                   onChange={(e) => setSearch(e.target.value)}
                 />
                 <button
+                  type="submit"
                   className="px-4 py-2 mb-4 text-neutral-100 text-[10px] md:text-[17.5px] uppercase bg-teal-600 hover:bg-teal-500 rounded-sm w-full tracking-wider shadow-lg/30 hover:shadow-none hover:translate-y-0.5 focus:translate-y-0.5 focus:shadow-none"
-                  onClick={handleSearch}
+                  onClick={() => {
+                    if (menuRef.current) menuRef.current.checked = false;
+                  }}
                 >
                   Search
                 </button>
-              </label>
-              {/* Only show the list if the user has typed something */}
-              {search && filteredCoins.length > 0 && (
-                <div className="absolute z-10 w-[88%] bg-neutral-800 text-white border border-neutral-600 mt-1 max-h-60 rounded-sm shadow-xl">
-                  {filteredCoins.map((coin) => (
-                    <div 
-                      key={coin.id} 
-                      className="px-4 py-2 mb-4 cursor-pointer hover:bg-cyan-900 transition-colors"
-                      onClick={() => handleSelectCoin(coin)}
-                    >
-                      {coin.name}
-                    </div>
-                  ))}
-                </div>
-              )}
+                {/* </label> */}
+                {/* Only show the list if the user has typed something */}
+                {search && filteredCoins.length > 0 && (
+                  <div className="absolute z-100 w-[88%] bg-neutral-800 text-white border border-neutral-600 -mt-2.5 max-h-60 rounded-sm shadow-xl overflow-y-auto">
+                    {filteredCoins.map((coin) => (
+                      <button
+                        type="button"
+                        key={coin.id} 
+                        className="px-4 py-2 mb-4 cursor-pointer hover:bg-cyan-900 transition-colors"
+                        onClick={() => {
+                          handleSelectCoin(coin);
+                          if (menuRef.current) menuRef.current.checked = false;
+                        }}
+                      >
+                        {coin.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </form>
             </aside>
 
-            <main className="col-span-8 md:col-span-9 lg:col-span-10 bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 shadow-xl shadow-[#808080]/70 shrink-0 p-2 md:p-4 m-2 md:m-4 rounded-lg">
+            <main className="min-h-screen col-span-12 md:col-span-9 lg:col-span-10 bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 shadow-xl shadow-[#808080]/70 shrink-0 p-2 md:p-4 m-2 md:m-4 rounded-lg">
               <div className="pb-4 uppercase text-left font-semibold">
                 {selectedCoin ? (
                   <>
