@@ -40,8 +40,9 @@ const App: FC<CryptoDataProps> = () => {
   const url2 = useMemo(() =>`https://api.coingecko.com/api/v3/coins/${params.id}/market_chart?vs_currency=${params.currency}&days=${params.days}`, [params]);
 
   useEffect(() => {
-    document.body.className = `image-format ${themeConfig[currentIndex].className}`;
-  });
+    document.body.className = 
+      `image-format ${themeConfig[currentIndex].className}`;
+  }, [currentIndex]); // added dependency array
 
   useEffect(() => {
     const images = [
@@ -105,12 +106,21 @@ const App: FC<CryptoDataProps> = () => {
     return coins.filter((c) => c.name.toLowerCase().includes(search.toLowerCase()));
   }, [search, coins]);
 
-  const handleSelectCoin = (coin: CryptoDataProps) => { setSelectedCoin(coin); setSearch(''); };
+  const handleSelectCoin = (coin: CryptoDataProps) => { 
+    setSelectedCoin(coin);
+
+    setParams((prev) => ({
+      ...prev,
+      id: coin.id,
+    }));
+
+    setSearch(''); 
+  };
 
   return (
     <>
       <div className="data-shield">
-        <div className="min-h-screen w-full bg-neutral-200/20 antialiased overflow-x-hidden">
+        <div className="min-h-screen bg-neutral-200/20 antialiased overflow-x-hidden">
 
           {isLoading && (
             <div className="fixed inset-0 w-screen h-screen bg-neutral-900/80 flex items-center justify-center z-9999 backdrop-blur-sm text-white">
@@ -142,7 +152,7 @@ const App: FC<CryptoDataProps> = () => {
             Aegis Crypto Dashboard
           </h1>
 
-          <div className="grid grid-cols-12 ">
+          <div className="grid grid-cols-12">
             <input 
               type="checkbox" 
               id="menu-toggle" 
@@ -157,7 +167,13 @@ const App: FC<CryptoDataProps> = () => {
               <div className="ml-1 font-mono font-semibold uppercase tracking-wider">Crypto Sidebar</div>
             </label>
 
-            <aside className="fixed inset-0 z-40 top-25 md:top-0 transform transition-transform duration-300 translate-x-full peer-checked:translate-x-0 md:static md:col-span-3 lg:col-span-2 md:translate-x-0 peer-checked:left-0 md:block bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 shadow-xl shadow-[#808080]/70 shrink-0 p-2 md:p-4 m-2 md:m-4 rounded-lg">
+            <aside className="min-h-screen fixed inset-0 z-40 top-25 md:top-0 transform 
+              transition-transform duration-300 translate-x-full peer-checked:translate-x-0 
+              md:static md:col-span-3 lg:col-span-2 md:translate-x-0 peer-checked:left-0 md:block
+               bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 shadow-xl 
+               shadow-[#808080]/70 shrink-0 p-2 md:p-4 m-2 md:m-4 rounded-lg
+              overflow-y-auto overflow-scroll"
+            > { /*  added overflow-y-auto overflow-scroll */ }
               <div className="relative pb-4 mb-4 border-b border-mist-900/20 uppercase text-left font-semibold">
                 <h2 className="text-slate-700/80 text-sm md:text-base">Crypto // Assets</h2>
               </div>
@@ -180,13 +196,21 @@ const App: FC<CryptoDataProps> = () => {
               </div>
               
               <form
-                className="shadowy relative"
+                className="relative"
                 onSubmit={(e) => {
                   e.preventDefault();
-                  console.log("Searching for:", search);
+                  
+                  if (filteredCoins.length > 0) {
+                    handleSelectCoin(filteredCoins[0]);
+                  };
+
+                  if (menuRef.current) {
+                    menuRef.current.checked = false;
+                  };
+
+                  setSearch('');
                 }}
               >
-                {/* <label htmlFor="search" className="shadowy"> */}
                 <input 
                   type="search"
                   value={search}
@@ -205,7 +229,6 @@ const App: FC<CryptoDataProps> = () => {
                 >
                   Search
                 </button>
-                {/* </label> */}
                 {/* Only show the list if the user has typed something */}
                 {search && filteredCoins.length > 0 && (
                   <div className="absolute z-100 w-[88%] bg-neutral-800 text-white border border-neutral-600 -mt-2.5 max-h-60 rounded-sm shadow-xl overflow-y-auto">
