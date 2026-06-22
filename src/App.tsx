@@ -31,11 +31,6 @@ const App: FC<CryptoDataProps> = () => {
   }, [currentIndex]); // Removed the dependancy array at the advice of vs code
 
   useEffect(() => {
-    document.body.className = 
-      `image-format ${themeConfig[currentIndex].className}`;
-  }, [currentIndex]); // added dependency array
-
-  useEffect(() => {
     const controller = new AbortController();
 
     const fetchData1 = async () => {
@@ -136,7 +131,7 @@ const App: FC<CryptoDataProps> = () => {
                   setCurrentIndex(idx);
                   document.body.className = `image-format ${theme.className}`;
                 }}
-                className={`px-2 py-1 text-[11px] font-mono font-bold rounded-sm uppercase tracking-widest transition-all duration-300 hover:bg-white/10
+                className={`px-2 py-1 text-[10px] md:text-[12px] lg:text-[14px] font-mono font-bold rounded-sm uppercase tracking-widest transition-all duration-300 hover:bg-white/10
                   ${currentIndex === idx 
                     ? 'bg-white/20 text-white shadow-[0_0_15px_rgba(255,255,255,0.2)]' 
                     : 'text-white/70 hover:text-white hover:bg-white/30'

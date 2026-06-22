@@ -88,23 +88,23 @@
     /* ... keep your other root variables here ... */
   }
 
-  * { @apply border-border outline-ring/50; }
+  /* * { @apply border-border outline-ring/50; } */
   
-  html { @apply font-sans; }
+  /* html { @apply font-sans; } */
 
   body {
-    @apply bg-background text-foreground;
+    /* @apply bg-background text-foreground; */
     margin: 0;
     min-height: 100vh;
     transition: background-image 0.5s ease-in-out;
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
-    overflow-x: hidden;
+    /* overflow-x: hidden; */
   }
 
   main {
-    overflow-x: hidden;
+    /* overflow-x: hidden; */
   }
 }
 
