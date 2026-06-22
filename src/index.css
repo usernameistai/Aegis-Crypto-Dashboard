@@ -3,8 +3,6 @@
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
 
-@custom-variant dark (&:is(.dark *));
-
 @theme inline {
     --font-heading: var(--font-sans);
     --font-sans: 'Geist Variable', sans-serif;
@@ -85,145 +83,84 @@
 
 @layer base {
   :root {
-    --chart-1: 180 100% 50%;
-    --chart-2: 32 100% 50%;
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    /* ... keep your other root variables here ... */
+  }
+
+  * { @apply border-border outline-ring/50; }
+  
+  html { @apply font-sans; }
+
+  body {
+    @apply bg-background text-foreground;
+    margin: 0;
+    min-height: 100vh;
+    transition: background-image 0.5s ease-in-out;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    overflow-x: hidden;
+  }
+
+  main {
+    overflow-x: hidden;
   }
 }
 
-body {
-  margin: 0;
-  padding: 0;
-}
 
-.image-format {
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-}
 
-body.image-format {
-  transition: background-image 0.5s ease-in-out;
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-}
+/* --- THEME OVERRIDES --- */
+/* These classes now properly override the body background-image */
+.background { background-image: url('/background.webp'); }
+.background-nighttime { background-image: url('/backgroundNighttime.webp'); }
+.background-spring { background-image: url('/spring.webp'); }
+.background-summer { background-image: url('/summer.webp'); }
+.background-autumn { background-image: url('/autumn.webp'); }
+.background-winter { background-image: url('/winter.webp'); } /* Ensure correct paths */
 
-.background {
-  background-image: url('/background.webp');
-}
-
-.background-nighttime {
-  background-image: url('/backgroundNighttime.webp');
-}
-
-.background-spring {
-  background-image: url('/spring.webp');
-}
-
-.background-summer {
-  background-image: url('/summer.webp');
-}
-
-.background-autumn {
-  background-image: url('/autumn.webp');
-}
-
-.background-winter {
-  background-image: url('/winter.webp');
-}
-
-.data-shield {
-  position: relative;
-}
-
+/* --- LAYOUT UTILITIES --- */
+.data-shield { position: relative; }
 .data-shield::before {
   content: "";
   position: fixed;
   inset: 0;
-  background: rgba(225, 225, 225, 0.2); 
+  background: rgba(225, 225, 225, 0.05); 
   pointer-events: none;
   z-index: -1;
 }
 
-.shadowy {
-    box-shadow: 0 2px 4px 0px rgba(68, 83, 59, 0.3);
-}
-.shadowy:hover {
-    box-shadow: none;
-}
+/* --- LOADER COMPONENT --- */
+.frontier-loader { position: relative; width: 160px; height: 160px; }
 
-.dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0);
+.outer-ring {
+  position: absolute; inset: 0px; border-radius: 50%; border: 4px solid transparent;
+  border-top: 4px solid #e6dfd3; transform-origin: center;
+  animation: stepThirds 3s steps(3) infinite;
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-    }
-  body {
-    @apply bg-background text-foreground;
-    }
-  html {
-    @apply font-sans;
-    }
+.middle-base {
+  position: absolute; inset: 22px; border-radius: 50%;
+  border: 8px solid rgba(230, 223, 211, 0.15); 
 }
 
-@layer base {
-  :root {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    
-    --chart-1: 180 100% 50%;   
-    --chart-2: 32 100% 50%;  
-    --chart-3: 142 70% 50%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-  }
+.middle-wavefront {
+  position: absolute; inset: -8px; border-radius: 50%; border: 8px solid transparent;
+  border-image: conic-gradient(from 0deg, #e6dfd3, rgba(230, 223, 211, 0.4) 25%, transparent 60%) 1;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: smoothWave 1.8s linear infinite;
+}
 
-  .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --chart-1: 180 100% 50%;
-    --chart-2: 32 100% 50%;
-  }
+.inner-fill-empty {
+  position: absolute; inset: 48px; border-radius: 50%; border: 4px solid transparent;
+  animation: fillThenEmpty 4s linear infinite;
+}
+
+@keyframes stepThirds { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+@keyframes smoothWave { 0% { transform: rotate(360deg); } 100% { transform: rotate(0deg); } }
+@keyframes fillThenEmpty {
+  0% { border-top-color: #e6dfd3; transform: rotate(0deg); }
+  50% { border-color: #e6dfd3; transform: rotate(180deg); }
+  100% { border-color: transparent; transform: rotate(360deg); }
 }
