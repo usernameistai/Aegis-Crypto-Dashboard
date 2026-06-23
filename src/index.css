@@ -85,12 +85,9 @@
   :root {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
-    /* ... keep your other root variables here ... */
   }
 
-  /* * { @apply border-border outline-ring/50; } */
-  
-  /* html { @apply font-sans; } */
+
 
   body {
     /* @apply bg-background text-foreground; */
@@ -100,11 +97,6 @@
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
-    /* overflow-x: hidden; */
-  }
-
-  main {
-    /* overflow-x: hidden; */
   }
 }
 

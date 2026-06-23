@@ -31,12 +31,12 @@ const App: FC<CryptoDataProps> = () => {
   useEffect(() => {
     // Set intial background image for the main body
     document.body.className = `image-format ${themeConfig[currentIndex].className}`;
-  }, [currentIndex]); // Removed the dependancy array at the advice of vs code
+  }, [currentIndex]);
 
   useEffect(() => {
     const controller = new AbortController();
 
-    const fetchData1 = async () => {
+    const fetchCoins = async () => {
       setIsLoading(true);
       try {
         const res = await axios.get<CryptoDataProps[]>(url1, { signal: controller.signal });
@@ -47,7 +47,7 @@ const App: FC<CryptoDataProps> = () => {
         setIsLoading(false);
       }
     };
-    const fetchData2 = async () => {
+    const fetchCryptoData = async () => {
       setIsLoading(true);
       try {
         const res = await axios.get(url2, { signal: controller.signal });
@@ -58,8 +58,8 @@ const App: FC<CryptoDataProps> = () => {
         setIsLoading(false);
       }
     };
-    fetchData1();
-    fetchData2();
+    fetchCoins();
+    fetchCryptoData();
 
     return () => controller.abort();
   }, [url1, url2]);
@@ -129,7 +129,7 @@ const App: FC<CryptoDataProps> = () => {
                 key={theme.label}
                 onClick={() => {
                   setCurrentIndex(idx);
-                  document.body.className = `image-format ${theme.className}`;
+                  document.body.className = `${theme.className}`;
                 }}
                 className={`px-2 py-1 text-[10px] md:text-[12px] lg:text-[14px] font-mono font-bold rounded-sm uppercase tracking-widest transition-all duration-300 hover:bg-white/10
                   ${currentIndex === idx 
@@ -242,9 +242,9 @@ const App: FC<CryptoDataProps> = () => {
                 {coins.slice(0, 11).map((c) => (
                   <button 
                     key={c.id}
-                    className={`uppercase my-1 ml-2 md:ml-0 px-0.5 md:px-4 py-2 text-left text-[16px] 
-                      md:text-base font-semibold border-[1.5px] border-mist-400/10 rounded-lg
-                      hover:text-white hover:bg-neutral-700/20 hover:border-mist-100/50
+                    className={`uppercase my-1 ml-2 md:ml-0 px-4 md:px-4 py-2 text-left text-[16px] 
+                      md:text-base font-semibold border-[1.5px] border-mist-400/10 rounded-lg bg-white/10
+                      hover:text-white hover:bg-teal-700/20 hover:border-mist-100/50
                       ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80' : 'text-slate-700/80'}
                       `}
                     onClick={() => {
@@ -286,14 +286,14 @@ const App: FC<CryptoDataProps> = () => {
                       </div>
 
                       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-5 mb-5">
-                        <CryptoField label="24h Change" value={`${selectedCoin.price_change_percentage_24h.toFixed(2)}%`} subMetric={+(selectedCoin.price_change_24h.toFixed(5))} />
-                        <CryptoField label="24h High" value={`£${selectedCoin.high_24h}`} />
-                        <CryptoField label="24h Low" value={`£${selectedCoin.low_24h}`} />
-                        <CryptoField label="Total Volume" value={`£${(selectedCoin.total_volume / 1e9).toFixed(2)}B`} />
-                        <CryptoField label="Market Cap" value={`£${(selectedCoin.market_cap / 1e9).toFixed(2)}B`} />
-                        <CryptoField label="Market Rank" value={`${selectedCoin.market_cap_rank}`} />
-                        <CryptoField label="Circulating" value={`${(selectedCoin.circulating_supply / 1e6).toFixed(2)}M`} />
-                        <CryptoField label="Max Supply" value={selectedCoin.max_supply ? `${(selectedCoin.max_supply / 1e6).toFixed(2)}M` : `∞`} />
+                        <CryptoField label="24h Change" value={`${selectedCoin.price_change_percentage_24h.toFixed(2)}%`} subMetric={+(selectedCoin.price_change_24h.toFixed(5))} currentIndex={currentIndex} />
+                        <CryptoField label="24h High" value={`£${selectedCoin.high_24h}`} currentIndex={currentIndex} />
+                        <CryptoField label="24h Low" value={`£${selectedCoin.low_24h}`} currentIndex={currentIndex} />
+                        <CryptoField label="Total Volume" value={`£${(selectedCoin.total_volume / 1e9).toFixed(2)}B`} currentIndex={currentIndex} />
+                        <CryptoField label="Market Cap" value={`£${(selectedCoin.market_cap / 1e9).toFixed(2)}B`} currentIndex={currentIndex} />
+                        <CryptoField label="Market Rank" value={`${selectedCoin.market_cap_rank}`} currentIndex={currentIndex} />
+                        <CryptoField label="Circulating" value={`${(selectedCoin.circulating_supply / 1e6).toFixed(2)}M`} currentIndex={currentIndex} />
+                        <CryptoField label="Max Supply" value={selectedCoin.max_supply ? `${(selectedCoin.max_supply / 1e6).toFixed(2)}M` : `∞`} currentIndex={currentIndex} />
                       </div>
                     </div>
                     
