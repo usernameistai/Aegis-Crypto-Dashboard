@@ -13,25 +13,25 @@ export interface CryptoDataProps {
   total_volume: number;
   circulating_supply: number;
   max_supply: number;
-}
+};
 
 export interface CryptoDataHistory {
   id: string;
   currency: string;
   days: number;
-}
+};
 
 export interface CryptoDataPoint {
   date: string;
   price: number;
-}
+};
 
 export interface CryptoChartProps {
   data: CryptoDataPoint[];
   days: number;
   onDaysChange: (days: number) => void;
-}
+};
 
 export interface PriceResponse {
   prices: [number, number][]; // Array of [timestamp, price]
-}
+};

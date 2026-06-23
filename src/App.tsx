@@ -26,6 +26,9 @@ const App: FC<CryptoDataProps> = () => {
       const img = new Image();
       img.src = src;
     });
+  }, []);
+
+  useEffect(() => {
     // Set intial background image for the main body
     document.body.className = `image-format ${themeConfig[currentIndex].className}`;
   }, [currentIndex]); // Removed the dependancy array at the advice of vs code
@@ -54,7 +57,7 @@ const App: FC<CryptoDataProps> = () => {
       } finally {
         setIsLoading(false);
       }
-    }
+    };
     fetchData1();
     fetchData2();
 
@@ -79,16 +82,13 @@ const App: FC<CryptoDataProps> = () => {
 
   const handleSelectCoin = (coin: CryptoDataProps) => { 
     setSelectedCoin(coin);
-
     setParams((prev) => ({
       ...prev,
       id: coin.id,
     }));
-
     setSearch(''); 
 
     if (menuRef.current) menuRef.current.checked = false;
-
     window.scrollTo({
       top: 0,
       behavior: "smooth",
@@ -199,14 +199,14 @@ const App: FC<CryptoDataProps> = () => {
                   name="search" 
                   id="search" 
                   placeholder="Enter Crypto Coin"
-                  className="bg-neutral-100 px-2 md:px-4 py-1 md:py-2 my-2 text-[11px]
-                    md:text-base border border-neutral-300/50 focus:outline-none focus:ring-2
+                  className="bg-neutral-100 px-2 md:px-4 py-1 md:py-2 my-2 text-base
+                    border border-neutral-300/50 focus:outline-none focus:ring-2
                   focus:ring-cyan-500 rounded-sm w-full inset-shadow-xl inset-shadow-black"
                   onChange={(e) => setSearch(e.target.value)}
                 />
                 <button
                   type="submit"
-                  className="px-4 py-2 mb-4 text-neutral-100 text-[11px] md:text-[17.5px] 
+                  className="px-4 py-2 mb-4 text-neutral-100 text-base md:text-[17.5px] 
                     uppercase font-semibold bg-teal-500 hover:bg-teal-500/80 rounded-sm w-full 
                     tracking-wider shadow-lg/30 hover:shadow-none hover:translate-y-0.5 
                     focus:translate-y-0.5 focus:shadow-none"
@@ -242,7 +242,7 @@ const App: FC<CryptoDataProps> = () => {
                 {coins.slice(0, 11).map((c) => (
                   <button 
                     key={c.id}
-                    className={`uppercase my-1 px-0.5 md:px-4 py-2 text-left text-[12px] 
+                    className={`uppercase my-1 ml-2 md:ml-0 px-0.5 md:px-4 py-2 text-left text-[16px] 
                       md:text-base font-semibold border-[1.5px] border-mist-400/10 rounded-lg
                       hover:text-white hover:bg-neutral-700/20 hover:border-mist-100/50
                       ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80' : 'text-slate-700/80'}

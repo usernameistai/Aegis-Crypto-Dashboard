@@ -1,7 +1,7 @@
 export interface Theme {
   label: string;
   className: string;
-}
+};
 
 export const themeConfig: Theme[] = [
   { label: 'Default', className: 'background' },
@@ -11,6 +11,7 @@ export const themeConfig: Theme[] = [
   { label: 'Autumn', className: 'background-autumn' },
   { label: 'Winter', className: 'background-winter' },
 ];
+
 export const preload_images = [
   '/background.webp',
   '/backgroundNighttime.webp',
