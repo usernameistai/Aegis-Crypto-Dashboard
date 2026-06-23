@@ -14,8 +14,8 @@ const CryptoChart = ({ data, days, onDaysChange }: CryptoChartProps) => {
 
   return (
     <>
-      <Card className="pt-0 shadow-lg shadow-neutral-500/50">
-        <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
+      <Card className="pt-0 shadow-xl shadow-[#808080]/70 border-b-2 border-r-2 border-neutral-200/70">
+        <CardHeader className="flex items-center gap-2 space-y-0 border-b border-teal-700/70 py-5 sm:flex-row">
           
           <div className="grid flex-1 gap-1">
             <CardTitle className="text-xs md:text-base text-slate-500 font-bold">Asset Performance</CardTitle>

@@ -11,7 +11,7 @@ const CryptoField = ({ label, value, subMetric, currentIndex }: { label: string,
       ease-in-out hover:bg-white/30 hover:scale-115 focus:bg-white/30
       focus:scale-115"
     >
-      <div className="text-sm md:text-[14px] text-slate-300 uppercase mb-1">
+      <div className="text-sm md:text-[14px] text-slate-200 uppercase mb-1">
         {label}
       </div>
       <div className={`text-sm md:text-base font-bold font-mono 
