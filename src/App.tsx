@@ -99,7 +99,7 @@ const App: FC<CryptoDataProps> = () => {
     <>
       <div className="data-shield">
         <div className="min-h-screen bg-neutral-200/20 antialiased overflow-x-hidden">
-
+          
           {isLoading && (
             <>
               <div className="fixed inset-0 w-screen h-screen bg-neutral-900/80 
