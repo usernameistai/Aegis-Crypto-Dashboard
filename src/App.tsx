@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useRef } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import type { FC } from "react";
 import axios from "axios";
 import type { CryptoDataProps, CryptoDataHistory, PriceResponse } from "./types/cryptoDataTypes";
@@ -94,6 +94,12 @@ const App: FC<CryptoDataProps> = () => {
       behavior: "smooth",
     });
   };
+
+  // Test for break points
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setSearch(newValue);
+  }
 
   return (
     <>
@@ -202,7 +208,7 @@ const App: FC<CryptoDataProps> = () => {
                   className="bg-neutral-100 px-2 md:px-4 py-1 md:py-2 my-2 text-base
                     border border-neutral-300/50 focus:outline-none focus:ring-2
                   focus:ring-cyan-500 rounded-sm w-full inset-shadow-xl inset-shadow-black"
-                  onChange={(e) => setSearch(e.target.value)}
+                  onChange={handleSearchChange}
                 />
                 <button
                   type="submit"

@@ -1,0 +1,25 @@
+name: React Vite CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  verify-code:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout project code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js environment
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run Vite production build
+      run: npm run build
