@@ -285,62 +285,101 @@ const App: FC<CryptoDataProps> = () => {
                 <div className="pb-4 uppercase text-left font-semibold">
                   {selectedCoin ? (
                     <>
-                    <div className="relative">
-                      <h1 className={`flex justify-center md:justify-start pb-4 mb-4 text-base md:text-lg border-b
-                        ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 border-mist-200/20' : 'text-slate-700/80 border-mist-900/20'}`}
-                      >
-                        Aegis Crypto - {selectedCoin.name} ({selectedCoin.symbol.toUpperCase()}) Databoard
-                      </h1>
-                      <div className="bg-neutral-700/20 p-3.5 md:p-5 rounded-lg shadow-lg shadow-neutral-500/50">
-                        <div className={`border-b-2 pb-5 mb-5 flex justify-between items-end ${themeConfig[currentIndex].label === 'Night' ? 'border-neutral-200/70' : ' border-neutral-600/70'}`}>
-                          <div>
-                            <h1 className="text-lg md:text-3xl font-black text-white uppercase tracking-wide md:tracking-tighter">{selectedCoin.name}</h1>
-                            <p className="text-[11px] md:text-base font-black uppercase tracking-wide text-teal-400 ">{selectedCoin.id} // {selectedCoin.symbol.toUpperCase()}</p>
+                      <div className="relative">
+                        <h1 className={`flex justify-center md:justify-start pb-4 mb-4 text-base md:text-lg border-b
+                          ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 border-mist-200/20' : 'text-slate-700/80 border-mist-900/20'}`}
+                        >
+                          Aegis Crypto - {selectedCoin.name} ({selectedCoin.symbol.toUpperCase()}) Databoard
+                        </h1>
+                        <div className="bg-neutral-700/20 p-3.5 md:p-5 rounded-lg shadow-lg shadow-neutral-500/50">
+                        
+                          <div className={`border-b-2 pb-5 mb-5 flex justify-between items-end ${themeConfig[currentIndex].label === 'Night' ? 'border-neutral-200/70' : ' border-neutral-600/70'}`}>
+                            <div>
+                              <h1 className="flex items-center gap-1 text-lg md:text-3xl font-black text-white uppercase tracking-wide md:tracking-tighter">
+                                <img 
+                                  src={selectedCoin.image} 
+                                  className="h-5 md:h-8 w-5 md:w-8 object-contain"
+                                  alt={selectedCoin.name}
+                                /> 
+                                {selectedCoin.name}
+                              </h1>
+                              <p className="text-[11px] md:text-base font-black uppercase tracking-wide text-teal-400 ">{selectedCoin.id} // {selectedCoin.symbol.toUpperCase()}</p>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-lg md:text-3xl font-black text-white">£{`${selectedCoin.current_price <= 3 ? selectedCoin.current_price : selectedCoin.current_price.toLocaleString()}`}</div>
+                              <div className="text-[11px] md:text-base font-black text-teal-400 uppercase tracking-wide">Current Price</div>
+                            </div>
                           </div>
-                          <div className="text-right">
-                            <div className="text-lg md:text-3xl font-black text-white">£{`${selectedCoin.current_price <= 3 ? selectedCoin.current_price : selectedCoin.current_price.toLocaleString()}`}</div>
-                            <div className="text-[11px] md:text-base font-black text-teal-400 uppercase tracking-wide">Current Price</div>
-                          </div>
-                        </div>
 
-                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-5 mb-5">
-                          <CryptoField label="24h Change" value={`${selectedCoin.price_change_percentage_24h.toFixed(2)}%`} subMetric={+(selectedCoin.price_change_24h.toFixed(5))} currentIndex={currentIndex} />
-                          <CryptoField label="24h High" value={`£${selectedCoin.high_24h}`} currentIndex={currentIndex} />
-                          <CryptoField label="24h Low" value={`£${selectedCoin.low_24h}`} currentIndex={currentIndex} />
-                          <CryptoField label="Total Volume" value={`£${(selectedCoin.total_volume / 1e9).toFixed(2)}B`} currentIndex={currentIndex} />
-                          <CryptoField label="Market Cap" value={`£${(selectedCoin.market_cap / 1e9).toFixed(2)}B`} currentIndex={currentIndex} />
-                          <CryptoField label="Market Rank" value={`${selectedCoin.market_cap_rank}`} currentIndex={currentIndex} />
-                          <CryptoField label="Circulating" value={`${(selectedCoin.circulating_supply / 1e6).toFixed(2)}M`} currentIndex={currentIndex} />
-                          <CryptoField label="Max Supply" value={selectedCoin.max_supply ? `${(selectedCoin.max_supply / 1e6).toFixed(2)}M` : `∞`} currentIndex={currentIndex} />
+                          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-5 mb-5">
+                            <CryptoField label="24h Change" value={`${selectedCoin.price_change_percentage_24h.toFixed(2)}%`} subMetric={+(selectedCoin.price_change_24h.toFixed(5))} currentIndex={currentIndex} />
+                            <CryptoField label="24h High" value={`£${selectedCoin.high_24h}`} currentIndex={currentIndex} />
+                            <CryptoField label="24h Low" value={`£${selectedCoin.low_24h}`} currentIndex={currentIndex} />
+                            <CryptoField label="Total Volume" value={`£${(selectedCoin.total_volume / 1e9).toFixed(2)}B`} currentIndex={currentIndex} />
+                            <CryptoField label="Market Cap" value={`£${(selectedCoin.market_cap / 1e9).toFixed(2)}B`} currentIndex={currentIndex} />
+                            <CryptoField label="Market Rank" value={`${selectedCoin.market_cap_rank}`} currentIndex={currentIndex} />
+                            <CryptoField label="Circulating" value={`${(selectedCoin.circulating_supply / 1e6).toFixed(2)}M`} currentIndex={currentIndex} />
+                            <CryptoField label="Max Supply" value={selectedCoin.max_supply ? `${(selectedCoin.max_supply / 1e6).toFixed(2)}M` : `∞`} currentIndex={currentIndex} />
+                          </div>
                         </div>
-                      </div>
+                        
+                        <div className="flex my-5 mx-auto justify-center">
+                          {[7, 30, 90].map((day) => (
+                            <button
+                              key={day}
+                              className={`px-5 md:px-7 py-1 md:py-1.5 mx-auto md:mx-0 rounded-full border text-xs ${
+                                params.days === day
+                                  ? 'bg-neutral-800 text-white'
+                                  : 'bg-white/50 text-neutral-600 hover:bg-neutral-200'
+                              }`}
+                              onClick={() => setParams((prev) => ({ ...prev, days: day })) }
+                            >
+                              <span className="md:hidden">{day} days</span>
+                            </button>
+                          ))}
+                        </div>
                       
-                      <div className="flex my-5 mx-auto justify-center">
-                        {[7, 30, 90].map((day) => (
-                          <button
-                            key={day}
-                            className={`px-5 md:px-7 py-1 md:py-1.5 mx-auto md:mx-0 rounded-full border text-xs ${
-                              params.days === day
-                                ? 'bg-neutral-800 text-white'
-                                : 'bg-white/50 text-neutral-600 hover:bg-neutral-200'
-                            }`}
-                            onClick={() => setParams((prev) => ({ ...prev, days: day })) }
-                          >
-                            <span className="md:hidden">{day} days</span>
-                          </button>
-                        ))}
-                      </div>
-                    
-                      <CryptoChart 
-                        data={formattedData}
-                        days={params.days}
-                        onDaysChange={(newDays) => {
-                          setParams((prev) => ({
-                            ...prev,
-                            days: newDays,
-                          }));
-                        }}
-                      />
+                        <CryptoChart 
+                          data={formattedData}
+                          days={params.days}
+                          onDaysChange={(newDays) => {
+                            setParams((prev) => ({
+                              ...prev,
+                              days: newDays,
+                            }));
+                          }}
+                        />
+
+                        <div className="bg-neutral-700/20 p-3.5 md:p-5 mt-5 rounded-lg shadow-lg shadow-neutral-500/50">
+                          <div className={`border-b-2 pb-2 md:pb-5 mb-3 md:mb-5 flex justify-between items-end ${themeConfig[currentIndex].label === 'Night' ? 'border-neutral-200/70' : ' border-neutral-600/70'}`}>
+                            <div>
+                              <h1 className="flex items-center gap-1 text-lg md:text-3xl font-black text-white uppercase tracking-wide md:tracking-tighter">
+                                <img 
+                                  src={selectedCoin.image} 
+                                  className="h-5 md:h-8 w-5 md:w-8 object-contain"
+                                  alt={selectedCoin.name}
+                                /> 
+                                {selectedCoin.name}
+                              </h1>
+                              <p className="hidden md:block text-[11px] md:text-base font-black uppercase tracking-wide text-teal-400 ">{selectedCoin.id} // {selectedCoin.symbol.toUpperCase()}</p>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-lg md:text-3xl font-black text-white">£{`${selectedCoin.current_price <= 3 ? selectedCoin.current_price : selectedCoin.current_price.toLocaleString()}`}</div>
+                              <div className="hidden md:block text-[11px] md:text-base font-black text-teal-400 uppercase tracking-wide">Current Price</div>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-5 mb-5">
+                            <CryptoField label="Market Cap Change 24h" value={`${(selectedCoin.market_cap_change_24h / 1e9).toFixed(4)}B`} currentIndex={currentIndex} />
+                            <CryptoField label="Market Cap Change 24h %" value={`${selectedCoin.market_cap_change_percentage_24h.toFixed(2) ?? 0}%`} currentIndex={currentIndex} />
+                            <CryptoField label="Total Supply" value={`${(selectedCoin.total_supply / 1e6).toLocaleString() ?? 'N/A'}M`} currentIndex={currentIndex} />
+                            <CryptoField label="Max Supply" value={selectedCoin.max_supply ? `${(selectedCoin.max_supply / 1e6).toFixed(2)}M` : '∞'} currentIndex={currentIndex} />
+                            <CryptoField label="All Time High" value={`£${(selectedCoin.ath / 1e9).toFixed(2)}B`} currentIndex={currentIndex} />
+                            <CryptoField label="All Time High % Change" value={`${selectedCoin.ath_change_percentage?.toFixed(2) ?? '0'}`} currentIndex={currentIndex} />
+                            <CryptoField label="All Time Low" value={`£${(selectedCoin.atl).toFixed(2)}`} currentIndex={currentIndex} />
+                            <CryptoField label="All Time Low % Change" value={`${selectedCoin.atl_change_percentage.toFixed(2) ?? '0'}%`} currentIndex={currentIndex} />
+                          </div>
+                        </div>
                       </div>
                     </>
                   ) : (
