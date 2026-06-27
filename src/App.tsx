@@ -29,12 +29,11 @@ const App: FC<CryptoDataProps> = () => {
   }, []);
 
   useEffect(() => {
-    // Set intial background image for the main body
-    document.body.className = `image-format ${themeConfig[currentIndex].className}`;
+    document.body.className = `${themeConfig[currentIndex].className}`;
   }, [currentIndex]);
 
   useEffect(() => {
-    const controller = new AbortController();
+    const controller  = new AbortController();
 
     const fetchCoins = async () => {
       setIsLoading(true);
@@ -47,22 +46,30 @@ const App: FC<CryptoDataProps> = () => {
         setIsLoading(false);
       }
     };
-    const fetchCryptoData = async () => {
+    fetchCoins();
+    return () => controller.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchCryptoChartData = async () => {
+      setPriceData(null);
       setIsLoading(true);
       try {
         const res = await axios.get(url2, { signal: controller.signal });
         setPriceData(res.data);
       } catch (err) {
-        if (!axios.isCancel(err)) console.error(err);
+        if (!axios.isCancel(err)) console.error("Coin list fetch error", err);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchCoins();
-    fetchCryptoData();
-
+    fetchCryptoChartData();
     return () => controller.abort();
-  }, [url1, url2]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params])
 
   const formattedData = useMemo(() => {
     if (!priceData?.prices) return [];
@@ -82,6 +89,7 @@ const App: FC<CryptoDataProps> = () => {
 
   const handleSelectCoin = (coin: CryptoDataProps) => { 
     setSelectedCoin(coin);
+
     setParams((prev) => ({
       ...prev,
       id: coin.id,
@@ -89,17 +97,17 @@ const App: FC<CryptoDataProps> = () => {
     setSearch(''); 
 
     if (menuRef.current) menuRef.current.checked = false;
+    
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
   };
 
-  // Test for break points
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setSearch(newValue);
-  }
+  };
 
   return (
     <>
@@ -135,7 +143,7 @@ const App: FC<CryptoDataProps> = () => {
                 key={theme.label}
                 onClick={() => {
                   setCurrentIndex(idx);
-                  document.body.className = `${theme.className}`;
+                  // document.body.className = `${theme.className}`;
                 }}
                 className={`px-2 py-1 text-[10px] md:text-[12px] lg:text-[14px] font-mono font-bold rounded-sm uppercase tracking-widest transition-all duration-300 hover:bg-white/10
                   ${currentIndex === idx 
@@ -172,19 +180,20 @@ const App: FC<CryptoDataProps> = () => {
               <div className="ml-1 font-mono font-semibold uppercase tracking-wider">Crypto Sidebar</div>
             </label>
 
-            <aside className="min-h-screen fixed inset-0 z-40 top-25 md:top-0 transform 
-              transition-transform duration-300 translate-x-full peer-checked:translate-x-0 
-              md:static md:col-span-3 lg:col-span-2 md:translate-x-0 peer-checked:left-0 md:block
+            <aside 
+              className="min-h-screen fixed inset-0 z-40 top-25 md:top-0 transform 
+                transition-transform duration-300 translate-x-full peer-checked:translate-x-0 
+                md:static md:col-span-3 lg:col-span-2 md:translate-x-0 peer-checked:left-0 md:block
               bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 shadow-xl 
-              shadow-[#808080]/70 shrink-0 p-2 md:p-4 m-2 md:m-4 rounded-lg
-              overflow-y-auto touch-pan-y"
+                shadow-[#808080]/70 shrink-0 p-2 md:p-4 m-2 md:m-4 rounded-lg
+                overflow-y-auto touch-pan-y"
             > { /*  added overflow-y-auto overflow-scroll */ }
 
-              <div className="relative pb-4 mb-2 border-b border-mist-900/20 
-                uppercase text-left font-semibold"
+              <div className={`relative pb-4 mb-2 border-b uppercase text-left font-semibold
+                ${themeConfig[currentIndex].label === 'Night' ? 'border-mist-200/20' : 'border-mist-900/20'}`}
               >
                 <h2 className={`text-base md:text-lg
-                  ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80' : 'text-slate-700/80'}
+                  ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 ' : 'text-slate-700/80'}
                 `}>
                   Crypto // Assets
                 </h2>
@@ -234,7 +243,6 @@ const App: FC<CryptoDataProps> = () => {
                         className="px-4 py-2 mb-4 cursor-pointer hover:bg-cyan-900 transition-colors"
                         onClick={() => {
                           handleSelectCoin(coin);
-                          if (menuRef.current) menuRef.current.checked = false;
                         }}
                       >
                         {coin.name}
@@ -257,8 +265,8 @@ const App: FC<CryptoDataProps> = () => {
                       onClick={() => {
                         setSelectedCoin(c);
                         setParams((prev) => ({ ...prev, id: c.id }));
-
                         if (menuRef.current) menuRef.current.checked = false;
+                        // handleSelectCoin(c);
                       }}  
                     >
                       <h2>{c.id}</h2>
@@ -278,8 +286,9 @@ const App: FC<CryptoDataProps> = () => {
                   {selectedCoin ? (
                     <>
                     <div className="relative">
-                      <h1 className={`flex justify-center md:justify-start pb-4 mb-4 text-base md:text-lg border-b border-mist-900/20
-                      ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80' : 'text-slate-700/80'}`}>
+                      <h1 className={`flex justify-center md:justify-start pb-4 mb-4 text-base md:text-lg border-b
+                        ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 border-mist-200/20' : 'text-slate-700/80 border-mist-900/20'}`}
+                      >
                         Aegis Crypto - {selectedCoin.name} ({selectedCoin.symbol.toUpperCase()}) Databoard
                       </h1>
                       <div className="bg-neutral-700/20 p-3.5 md:p-5 rounded-lg shadow-lg shadow-neutral-500/50">

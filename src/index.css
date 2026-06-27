@@ -86,9 +86,6 @@
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
   }
-
-
-
   body {
     /* @apply bg-background text-foreground; */
     margin: 0;
@@ -100,9 +97,7 @@
   }
 }
 
-
-
-/* --- THEME OVERRIDES --- */
+/* --- THEME CLASSES AND IMAGES --- */
 /* These classes now properly override the body background-image */
 .background { background-image: url('/background.webp'); }
 .background-nighttime { background-image: url('/backgroundNighttime.webp'); }
@@ -110,6 +105,19 @@
 .background-summer { background-image: url('/summer.webp'); }
 .background-autumn { background-image: url('/autumn.webp'); }
 .background-winter { background-image: url('/winter.webp'); } /* Ensure correct paths */
+
+.background, 
+.background-nighttime, 
+.background-spring, 
+.background-summer, 
+.background-autumn, 
+.background-winter {
+  transition: background-image 0.6s ease-in-out;
+  will-change: background-image;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed; /* Keeps it "mission" steady */
+}
 
 /* --- LAYOUT UTILITIES --- */
 .data-shield { position: relative; }
@@ -124,18 +132,15 @@
 
 /* --- LOADER COMPONENT --- */
 .frontier-loader { position: relative; width: 160px; height: 160px; }
-
 .outer-ring {
   position: absolute; inset: 0px; border-radius: 50%; border: 4px solid transparent;
   border-top: 4px solid #e6dfd3; transform-origin: center;
   animation: stepThirds 3s steps(3) infinite;
 }
-
 .middle-base {
   position: absolute; inset: 22px; border-radius: 50%;
   border: 8px solid rgba(230, 223, 211, 0.15); 
 }
-
 .middle-wavefront {
   position: absolute; inset: -8px; border-radius: 50%; border: 8px solid transparent;
   border-image: conic-gradient(from 0deg, #e6dfd3, rgba(230, 223, 211, 0.4) 25%, transparent 60%) 1;
@@ -143,7 +148,6 @@
   -webkit-mask-composite: xor; mask-composite: exclude;
   animation: smoothWave 1.8s linear infinite;
 }
-
 .inner-fill-empty {
   position: absolute; inset: 48px; border-radius: 50%; border: 4px solid transparent;
   animation: fillThenEmpty 4s linear infinite;
