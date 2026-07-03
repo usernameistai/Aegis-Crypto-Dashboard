@@ -55,8 +55,17 @@ const CryptoChart = ({ data, days, onDaysChange }: CryptoChartProps) => {
         </CardHeader>
 
         <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
+          <div className="sr-only">
+            <h3>Chart summary: Crypto values</h3>
+            <p>
+              This chart displays the price of the selected crypto coin over the last {days} days.
+              You can alter the time period using the menu above.
+            </p>
+          </div>
           <AnimatePresence mode="wait">
             <motion.div
+              role="img"
+              aria-label={`Crypto value chart for last ${days} days`}
               key={days} // Changing the 'days' triggers the animation cycle
               initial={{ opacity: 0, y: 10, filter: "blur(5px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}

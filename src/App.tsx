@@ -1,11 +1,11 @@
-import React, { useEffect, useMemo, useState, useRef } from "react";
-import type { FC } from "react";
+import React, { useEffect, useMemo, useState, useRef, type FC } from "react";
 import axios from "axios";
-import type { CryptoDataProps, CryptoDataHistory, PriceResponse } from "./types/cryptoDataTypes";
+import type { CryptoDataProps, CryptoDataHistory, PriceResponse, CryptoDataPoint } from "./types/cryptoDataTypes";
 import CryptoChart from "./components/CryptoChart";
-import { LuSquareMenu } from "react-icons/lu";
-import { themeConfig, preload_images } from "./config/themeConfig";
 import CryptoField from "./components/CryptoField";
+import CryptoTable from "./components/CryptoTable";
+import { themeConfig, preload_images } from "./config/themeConfig";
+import { LuSquareMenu } from "react-icons/lu";
 
 const App: FC<CryptoDataProps> = () => {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
@@ -15,9 +15,12 @@ const App: FC<CryptoDataProps> = () => {
   const [params, setParams] = useState<CryptoDataHistory>({ id: `bitcoin`, currency: 'gbp', days: 90 });
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+  const [isDataExpanded, setIsDataExpanded] = useState(false);
   const menuRef = useRef<HTMLInputElement>(null);
+  const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const url1 = useMemo(() => `https://api.coingecko.com/api/v3/coins/markets?vs_currency=gbp&order=market_cap_desc&per_page=250&page=1`, []);
+  const url1 = useMemo(() => `https://api.coingecko.com/api/v3/coins/markets?vs_currency=gbp&order=market_cap_desc&per_page=250&page=1&sparkline=true`, []);
   const url2 = useMemo(() =>`https://api.coingecko.com/api/v3/coins/${params.id}/market_chart?vs_currency=${params.currency}&days=${params.days}`, [params]);
   
   useEffect(() => {
@@ -26,9 +29,11 @@ const App: FC<CryptoDataProps> = () => {
       const img = new Image();
       img.src = src;
     });
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     window.scrollTo({
       top: 0,
-      behavior: "smooth",
+      behavior: prefersReducedMotion? 'instant' : 'smooth',
     });
   }, []);
 
@@ -73,7 +78,51 @@ const App: FC<CryptoDataProps> = () => {
     fetchCryptoChartData();
     return () => controller.abort();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params])
+  }, [params]);
+
+  // useEffect(() => {
+  //   if (coins.length === 0) return;
+  //   const controller = new AbortController();
+
+  //   const fetchAll = async () => {
+  //     setIsLoading(true);
+  //     const tempData: Record<string, CryptoDataPoint[]> = {};
+
+  //     for (const coin of coins.slice(0, 11)) {
+  //       try {
+  //         const res = await axios.get(`https://api.coingecko.com/api/v3/coins/${coin.id}/market_chart?vs_currency=gbp&days=7`, { signal: controller.signal });
+  //         tempData[coin.id] = res.data.prices.map((p: [number, number]) => ({
+  //           date: new Date(p[0]).toISOString(),
+  //           price: p[1],
+  //         }));
+  //         // Mandatory delay between requests
+  //         await new Promise((resolve) => setTimeout(resolve, 1500));
+  //         } catch (err) {
+  //           console.error(`Failed to fetch ${coin.id}`, err);
+  //       }
+  //     };
+  //   setSparkLineData(tempData);
+  //   setIsLoading(false);
+  //   }
+  //   fetchAll();
+  //   return () => controller.abort();
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
+
+  const sparkLineData = useMemo(() => {
+    const result: Record<string, CryptoDataPoint[]> = {};
+
+    coins.forEach((coin) => {
+      if (!coin.sparkline_in_7d?.price) return;
+
+      result[coin.id] = coin.sparkline_in_7d.price.map((p: number, i: number) => ({
+        date: new Date(Date.now() - (7 - i) * 3600 * 1000).toISOString(),
+        price: p,
+      }));
+    });
+
+    return result;
+  }, [coins]);
 
   const formattedData = useMemo(() => {
     if (!priceData?.prices) return [];
@@ -113,20 +162,36 @@ const App: FC<CryptoDataProps> = () => {
     setSearch(newValue);
   };
 
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (e.relatedTarget && e.currentTarget.form?.contains(e.relatedTarget)) {
+      return;
+    }
+
+    if (blurTimeoutRef.current) {
+      clearTimeout(blurTimeoutRef.current);
+    };
+    
+    blurTimeoutRef.current = setTimeout(() => {
+      setSearch('');
+    }, 200);
+  };
+  
+
   return (
     <>
-      <div className="data-shield">
+      <div className="data-shield" aria-hidden={isLoading ? "true" : "false"}>
         <div className="min-h-screen bg-neutral-200/20 antialiased overflow-x-hidden">
           
           {isLoading && (
             <>
-              <div className="fixed inset-0 w-screen h-screen bg-neutral-900/80 
+              <div role="status" aria-live="polite" aria-label="Loading Crypto Data"
+                className="fixed inset-0 w-screen h-screen bg-neutral-900/80 
                 flex flex-col items-center justify-center z-9999 backdrop-blur-sm text-white">
                 <p className="animate-pulse font-mono tracking-[0.3em] uppercase mb-4">
                   Syncing Crypto Data...
                 </p>
 
-                <div className="frontier-loader">
+                <div className="frontier-loader" aria-hidden="true">
                   <div className="outer-ring"></div>
                   <div className="middle-base">
                       <div className="middle-wavefront"></div>
@@ -138,17 +203,17 @@ const App: FC<CryptoDataProps> = () => {
             </>
           )}
 
-          <div className={`flex backdrop-blur-md border border-white/10
+          <section aria-label="Theme selection"
+            className={`flex backdrop-blur-md border border-white/10
             rounded-md p-1 shadow-[0_4px_30px_rgba(0,0,0,0.1)] justify-between
             ${themeConfig[currentIndex].label === 'Default' ? 'bg-neutral-400/50' : 'bg-white/5'}`}
           >
             {themeConfig.map((theme, idx) => (
               <button
                 key={theme.label}
-                onClick={() => {
-                  setCurrentIndex(idx);
-                  // document.body.className = `${theme.className}`;
-                }}
+                role="tab"
+                aria-pressed={currentIndex === idx ? true : false}
+                onClick={() => setCurrentIndex(idx)}
                 className={`px-2 py-1 text-[10px] md:text-[12px] lg:text-[14px] font-mono font-bold rounded-sm uppercase tracking-widest transition-all duration-300 hover:bg-white/10
                   ${currentIndex === idx 
                     ? 'bg-white/20 text-white shadow-[0_0_15px_rgba(255,255,255,0.2)]' 
@@ -158,7 +223,7 @@ const App: FC<CryptoDataProps> = () => {
                 {theme.label}
               </button>
             ))}
-          </div>
+          </section>
           
           <h1 className={`top-0 mt-3 mb-10 md:my-3 text-center text-[#808080]
             text-xl md:text-4xl uppercase font-black tracking-[0.225em]
@@ -179,6 +244,11 @@ const App: FC<CryptoDataProps> = () => {
               className="touch-manipulation md:hidden p-2 fixed top-18 left-2 z-50 
                 bg-neutral900/50 backdrop-blur-sm border border-white/10 text-teal-500
                 rounded-lg cursor-pointer flex items-center gap-2"
+              role="button"
+              aria-label="Toggle Crypto Sidebar Menu"
+              aria-expanded={isOpen}
+              onClick={() => setIsOpen(!isOpen)}
+              aria-controls="Crypto-Sidebar"
             >
               <div><LuSquareMenu size={24}/></div> 
               <div className="ml-1 font-mono font-semibold uppercase tracking-wider">Crypto Sidebar</div>
@@ -191,14 +261,19 @@ const App: FC<CryptoDataProps> = () => {
               bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 shadow-xl 
                 shadow-[#808080]/70 shrink-0 p-2 md:p-4 m-2 md:m-4 rounded-lg
                 overflow-y-auto touch-pan-y"
+              id="Crypto-Sidebar"
+              aria-labelledby="Crypto-Menu-Title"
             > { /*  added overflow-y-auto overflow-scroll */ }
 
               <div className={`relative pb-4 mb-2 border-b uppercase text-left font-semibold
                 ${themeConfig[currentIndex].label === 'Night' ? 'border-mist-200/20' : 'border-mist-900/20'}`}
               >
-                <h2 className={`text-base md:text-lg
-                  ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 ' : 'text-slate-700/80'}
-                `}>
+                <h2 
+                  id="Crypto-Menu-Title"
+                  className={`text-base md:text-lg
+                    ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 ' : 'text-slate-700/80'}
+                  `}
+                >
                   Crypto // Assets
                 </h2>
               </div>
@@ -212,16 +287,22 @@ const App: FC<CryptoDataProps> = () => {
                   setSearch('');
                 }}
               >
+                <label htmlFor="search" className="sr-only"></label>
                 <input 
                   type="search"
                   value={search}
                   name="search" 
-                  id="search" 
+                  id="search"
+                  autoComplete="off"
+                  aria-autocomplete="list"
+                  aria-expanded={search.length > 0 && filteredCoins.length > 0}
+                  aria-controls="Crypto-Coin-List"
                   placeholder="Enter Crypto Coin"
                   className="bg-neutral-100 px-2 md:px-4 py-1 md:py-2 my-2 text-base
                     border border-neutral-300/50 focus:outline-none focus:ring-2
                   focus:ring-cyan-500 rounded-sm w-full inset-shadow-xl inset-shadow-black"
                   onChange={handleSearchChange}
+                  onBlur={handleBlur}
                 />
                 <button
                   type="submit"
@@ -237,13 +318,18 @@ const App: FC<CryptoDataProps> = () => {
                 </button>
                 {/* Only show the list if the user has typed something */}
                 {search && filteredCoins.length > 0 && (
-                  <div className="absolute z-100 w-[88%] bg-neutral-800 text-white border
-                   border-neutral-600 -mt-2.5 max-h-60 rounded-sm shadow-xl overflow-y-auto"
+                  <div 
+                    id="Crypto-Coin-List"
+                    role="listbox"
+                    className="absolute z-100 w-[88%] bg-cyan-800 text-white border
+                    border-neutral-600 -mt-2.5 max-h-60 rounded-sm shadow-xl overflow-y-auto"
+                    aria-live="polite"
                   >
                     {filteredCoins.map((coin) => (
                       <button
                         type="button"
-                        key={coin.id} 
+                        key={coin.id}
+                        role="option"
                         className="px-4 py-2 mb-4 cursor-pointer hover:bg-cyan-900 transition-colors"
                         onClick={() => {
                           handleSelectCoin(coin);
@@ -257,26 +343,29 @@ const App: FC<CryptoDataProps> = () => {
               </form>
               
               {coins && 
-                <div className="flex flex-col gap-y-2 text-slate-700/80">
-                  {coins.slice(0, 11).map((c) => (
-                    <button 
-                      key={c.id}
-                      className={`uppercase my-1 ml-2 md:ml-0 px-4 md:px-4 py-2 text-left text-[16px] 
-                        md:text-base font-semibold border-[1.5px] border-mist-400/10 rounded-lg bg-white/10
-                        hover:text-white hover:bg-teal-300/20 hover:border-mist-100/50
-                        ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80' : 'text-slate-700/80'}
-                        `}
-                      onClick={() => {
-                        setSelectedCoin(c);
-                        setParams((prev) => ({ ...prev, id: c.id }));
-                        if (menuRef.current) menuRef.current.checked = false;
-                        // handleSelectCoin(c);
-                      }}  
-                    >
-                      <h2>{c.id}</h2>
-                    </button>
-                  ))}
-                </div>
+                <nav aria-label="Crypto Coin Selection">
+                  <ul className="flex flex-col gap-y-2 text-slate-700/80">
+                    {coins.slice(0, 11).map((c) => (
+                      <li key={c.id}>
+                        <button 
+                          className={`w-full uppercase my-1 ml-2 md:ml-0 px-4 md:px-4 py-2 text-left text-[16px] 
+                            md:text-base font-semibold border-[1.5px] border-mist-400/10 rounded-lg bg-white/10
+                            hover:text-white hover:bg-teal-300/20 hover:border-mist-100/50
+                            ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80' : 'text-slate-700/80'}
+                            `}
+                          onClick={() => {
+                            setSelectedCoin(c);
+                            setParams((prev) => ({ ...prev, id: c.id }));
+                            if (menuRef.current) menuRef.current.checked = false;
+                            // handleSelectCoin(c);
+                          }}  
+                        >
+                          {c.id}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
               }
               
             </aside>
@@ -286,27 +375,31 @@ const App: FC<CryptoDataProps> = () => {
               shadow-xl shadow-[#808080]/70 shrink-0 p-4 m-2 md:m-4 rounded-lg"
             >
               {priceData &&
-                <div className="pb-4 uppercase text-left font-semibold">
+                <section aria-labelledby="Main-Data-Title"
+                  className="pb-4 uppercase text-left font-semibold"
+                >
                   {selectedCoin ? (
                     <>
                       <div className="relative">
-                        <h1 className={`flex justify-center md:justify-start pb-4 mb-4 text-base md:text-lg border-b
+                        <h2 
+                          id="Main-Data-Title"
+                          className={`flex justify-center md:justify-start pb-4 mb-4 text-base md:text-lg border-b
                           ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 border-mist-200/20' : 'text-slate-700/80 border-mist-900/20'}`}
                         >
                           Aegis Crypto - {selectedCoin.name} ({selectedCoin.symbol.toUpperCase()}) Databoard
-                        </h1>
-                        <div className="bg-neutral-700/20 p-3.5 md:p-5 rounded-lg shadow-lg shadow-neutral-500/50">
-                        
+                        </h2>
+
+                        <section aria-label="Crypto Data" className="bg-neutral-700/20 p-3.5 md:p-5 rounded-lg shadow-lg shadow-neutral-500/50">
                           <div className={`border-b-2 pb-5 mb-5 flex justify-between items-end ${themeConfig[currentIndex].label === 'Night' ? 'border-neutral-200/70' : ' border-neutral-600/70'}`}>
                             <div>
-                              <h1 className="flex items-center gap-1 text-xl md:text-3xl font-black text-white uppercase tracking-wide md:tracking-tighter">
+                              <h3 className="flex items-center gap-1 text-xl md:text-3xl font-black text-white uppercase tracking-wide md:tracking-tighter">
                                 <img 
                                   src={selectedCoin.image} 
                                   className="h-6 md:h-8 w-6 md:w-8 object-contain"
                                   alt={selectedCoin.name}
                                 /> 
                                 {selectedCoin.name}
-                              </h1>
+                              </h3>
                               <p className="text-[12px] md:text-base font-black uppercase tracking-wide text-teal-400 ">{selectedCoin.id} // {selectedCoin.symbol.toUpperCase()}</p>
                             </div>
                             <div className="text-right">
@@ -325,12 +418,18 @@ const App: FC<CryptoDataProps> = () => {
                             <CryptoField label="Circulating" value={`${(selectedCoin.circulating_supply / 1e6).toFixed(2)}M`} currentIndex={currentIndex} />
                             <CryptoField label="Max Supply" value={selectedCoin.max_supply ? `${(selectedCoin.max_supply / 1e6).toFixed(3)}M` : `∞`} currentIndex={currentIndex} />
                           </div>
-                        </div>
+                        </section>
                         
-                        <div className="flex my-5 mx-auto justify-center">
+                        <section 
+                          role="group"
+                          aria-label="Select Crypto Chart Time Range"
+                          className="flex my-5 mx-auto justify-center"
+                        >
                           {[7, 30, 90].map((day) => (
                             <button
                               key={day}
+                              aria-pressed={params.days === day}
+                              aria-label={`${day} days`}
                               className={`px-5 md:px-7 py-1 md:py-1.5 mx-auto md:mx-0 rounded-full border text-xs ${
                                 params.days === day
                                   ? 'bg-neutral-800 text-white'
@@ -339,9 +438,10 @@ const App: FC<CryptoDataProps> = () => {
                               onClick={() => setParams((prev) => ({ ...prev, days: day })) }
                             >
                               <span className="md:hidden">{day} days</span>
+                              <span className="sr-only">{day} days</span>
                             </button>
                           ))}
-                        </div>
+                        </section>
                       
                         <CryptoChart 
                           data={formattedData}
@@ -354,18 +454,24 @@ const App: FC<CryptoDataProps> = () => {
                           }}
                         />
 
-                        <div className="bg-neutral-700/20 p-3.5 md:p-5 mt-5 rounded-lg shadow-lg shadow-neutral-500/50">
+                        <section aria-label="Crypto Data Two" className="bg-neutral-700/20 p-3.5 md:p-5 mt-5 rounded-lg shadow-lg shadow-neutral-500/50">
                           <div className={` lg:hidden border-b-2 pb-2 md:pb-5 mb-3 md:mb-5 flex justify-between items-end ${themeConfig[currentIndex].label === 'Night' ? 'border-neutral-200/70' : ' border-neutral-600/70'}`}>
-                            <label htmlFor="crypto-toggle" className="cursor-pointer">
+                            
+                            <label 
+                              htmlFor="crypto-toggle" 
+                              className="cursor-pointer"
+                              role="button"
+                              aria-label="Toggle for more Crypto Info"
+                            >
                               <div>
-                                <h1 className="flex items-center gap-1 text-xl md:text-3xl font-black text-white uppercase tracking-wide md:tracking-tighter">
+                                <h3 className="flex items-center gap-1 text-xl md:text-3xl font-black text-white uppercase tracking-wide md:tracking-tighter">
                                   <img 
                                     src={selectedCoin.image} 
                                     className="h-5 md:h-8 w-5 md:w-8 object-contain"
                                     alt={selectedCoin.name}
                                   /> 
                                   {selectedCoin.name}
-                                </h1>
+                                </h3>
                                 <p className="hidden md:block text-[12px] md:text-base font-black uppercase tracking-wide text-teal-400 ">{selectedCoin.id} // {selectedCoin.symbol.toUpperCase()}</p>
                               </div>
                             </label>
@@ -376,28 +482,61 @@ const App: FC<CryptoDataProps> = () => {
                             
                           </div>
                           
-                          <input type="checkbox" id="crypto-toggle" className="peer hidden" />
-                          <div className="hidden peer-checked:grid lg:grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-5 mb-5 lg:mt-5">
+                          <input 
+                              type="checkbox" 
+                              id="crypto-toggle" 
+                              className="peer hidden"
+                              checked={isDataExpanded}
+                              aria-controls="Further-Crypto-Info"
+                              onChange={() => setIsDataExpanded(!isDataExpanded)}
+                              aria-expanded={isDataExpanded}
+                            />
+                          <div
+                            id="Further-Crypto-Info"
+                            className="hidden peer-checked:grid lg:grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-5 mb-5 lg:mt-5"
+                          >
                             <CryptoField label="Market Cap Change 24h" value={`${(selectedCoin.market_cap_change_24h / 1e9).toFixed(4)}B`} currentIndex={currentIndex} />
                             <CryptoField label="Market Cap Change 24h %" value={`${selectedCoin.market_cap_change_percentage_24h.toFixed(2) ?? 0}%`} currentIndex={currentIndex} />
                             <CryptoField label="Total Supply" value={`${(selectedCoin.total_supply / 1e6).toFixed(3) ?? 'N/A'}M`} currentIndex={currentIndex} />
                             <CryptoField label="Max Supply" value={selectedCoin.max_supply ? `${(selectedCoin.max_supply / 1e6).toFixed(2)}M` : '∞'} currentIndex={currentIndex} />
                             <CryptoField label="All Time High" value={`£${(selectedCoin.ath).toFixed(2)}`} currentIndex={currentIndex} />
-                            <CryptoField label="All Time High % Change" value={`${selectedCoin.ath_change_percentage?.toFixed(2) ?? '0'}`} currentIndex={currentIndex} />
+                            <CryptoField label="All Time High % Change" value={`${selectedCoin.ath_change_percentage?.toFixed(2) ?? '0'}%`} currentIndex={currentIndex} />
                             <CryptoField label="All Time Low" value={`£${(selectedCoin.atl).toFixed(2)}`} currentIndex={currentIndex} />
                             <CryptoField label="All Time Low % Change" value={`${selectedCoin.atl_change_percentage.toFixed(2) ?? '0'}%`} currentIndex={currentIndex} />
                           </div>
-                        </div>
+                        </section>
                       </div>
                     </>
                   ) : (
                     <>
-                      <h1 className="flex justify-center pb-4 mb-4 text-base md:text-lg text-slate-700/80">Select a Cryptocurrency from sidebar to view data</h1>
+                      <h3 className="flex justify-center pb-4 mb-4 text-base md:text-lg text-slate-700/80">Select a Cryptocurrency from sidebar to view data</h3>
                     </>
                   )}
-                </div>
+                </section>
+
               }
             </main>
+            <section className="fixed inset-0 z-40 top-25 md:top-0 transform 
+                transition-transform duration-300 translate-x-full
+                md:static col-span-full md:translate-x-0
+              bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 shadow-xl 
+                shadow-[#808080]/70 shrink-0 p-2 md:p-4 m-2 md:m-4 rounded-lg
+                overflow-y-auto touch-pan-y"
+            >
+              <div className={`relative pb-4 mb-2 border-b uppercase text-center font-semibold
+                ${themeConfig[currentIndex].label === 'Night' ? 'border-mist-200/20' : 'border-mist-900/20'}`}
+              >
+                <h2 
+                  id="Crypto-Menu-Title"
+                  className={`text-base md:text-lg
+                    ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 ' : 'text-slate-700/80'}
+                  `}
+                >
+                  Top 11 Crypto Coins by rank
+                </h2>
+              </div>
+              <CryptoTable coins={coins} historyData={sparkLineData} />
+            </section>
 
           </div>
         </div>

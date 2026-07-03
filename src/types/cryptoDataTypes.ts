@@ -24,6 +24,9 @@ export interface CryptoDataProps {
   atl_change_percentage:  number; // new
   atl_date: string; // new
   last_updated: string; // new
+  sparkline_in_7d: {
+    price: number[];
+  }
 };
 
 export interface CryptoDataHistory {
@@ -45,4 +48,9 @@ export interface CryptoChartProps {
 
 export interface PriceResponse {
   prices: [number, number][]; // Array of [timestamp, price]
+};
+
+export interface CryptoTableProps {
+  coins: CryptoDataProps[];
+  historyData: Record<string, CryptoDataPoint[]>;
 };

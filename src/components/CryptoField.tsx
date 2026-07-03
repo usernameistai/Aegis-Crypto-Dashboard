@@ -13,9 +13,14 @@ const CryptoField = (
 ) => {
   const theme = themeConfig[currentIndex ?? 0];
 
+  const ariaLabel = subMetric !== undefined
+    ? `${label}: ${value}, change is ${subMetric}`
+    : `${label}: ${value}`
+
   return (
     <div 
       tabIndex={0}
+      aria-label={ariaLabel}
       className="relative
         bg-neutral-400/20 border border-white/20 
         shadow-md p-4 rounded-md font-black tracking-wider 
