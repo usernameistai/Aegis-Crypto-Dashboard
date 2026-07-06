@@ -80,35 +80,6 @@ const App: FC<CryptoDataProps> = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params]);
 
-  // useEffect(() => {
-  //   if (coins.length === 0) return;
-  //   const controller = new AbortController();
-
-  //   const fetchAll = async () => {
-  //     setIsLoading(true);
-  //     const tempData: Record<string, CryptoDataPoint[]> = {};
-
-  //     for (const coin of coins.slice(0, 11)) {
-  //       try {
-  //         const res = await axios.get(`https://api.coingecko.com/api/v3/coins/${coin.id}/market_chart?vs_currency=gbp&days=7`, { signal: controller.signal });
-  //         tempData[coin.id] = res.data.prices.map((p: [number, number]) => ({
-  //           date: new Date(p[0]).toISOString(),
-  //           price: p[1],
-  //         }));
-  //         // Mandatory delay between requests
-  //         await new Promise((resolve) => setTimeout(resolve, 1500));
-  //         } catch (err) {
-  //           console.error(`Failed to fetch ${coin.id}`, err);
-  //       }
-  //     };
-  //   setSparkLineData(tempData);
-  //   setIsLoading(false);
-  //   }
-  //   fetchAll();
-  //   return () => controller.abort();
-  // // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
-
   const sparkLineData = useMemo(() => {
     const result: Record<string, CryptoDataPoint[]> = {};
 
@@ -409,7 +380,7 @@ const App: FC<CryptoDataProps> = () => {
                           </div>
 
                           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-5 mb-5">
-                            <CryptoField label="24h Change" value={`${selectedCoin.price_change_percentage_24h.toFixed(2)}%`} subMetric={+(selectedCoin.price_change_24h.toFixed(5))} currentIndex={currentIndex} />
+                            <CryptoField label="24h Change" value={`${(selectedCoin.price_change_percentage_24h ?? 0).toFixed(2)}%`} subMetric={+((selectedCoin.price_change_24h ?? 0).toFixed(5))} currentIndex={currentIndex} />
                             <CryptoField label="24h High" value={`£${selectedCoin.high_24h}`} currentIndex={currentIndex} />
                             <CryptoField label="24h Low" value={`£${selectedCoin.low_24h}`} currentIndex={currentIndex} />
                             <CryptoField label="Total Volume" value={`${(selectedCoin.total_volume / 1e9).toFixed(2)}B`} currentIndex={currentIndex} />
@@ -495,8 +466,8 @@ const App: FC<CryptoDataProps> = () => {
                             id="Further-Crypto-Info"
                             className="hidden peer-checked:grid lg:grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-5 mb-5 lg:mt-5"
                           >
-                            <CryptoField label="Market Cap Change 24h" value={`${(selectedCoin.market_cap_change_24h / 1e9).toFixed(4)}B`} currentIndex={currentIndex} />
-                            <CryptoField label="Market Cap Change 24h %" value={`${selectedCoin.market_cap_change_percentage_24h.toFixed(2) ?? 0}%`} currentIndex={currentIndex} />
+                            <CryptoField label="Market Cap Change 24h" value={`${((selectedCoin.market_cap_change_24h ?? 0) / 1e9).toFixed(4)}B`} currentIndex={currentIndex} />
+                            <CryptoField label="Market Cap Change 24h %" value={`${(selectedCoin.market_cap_change_percentage_24h ?? 0).toFixed(2) ?? 0}%`} currentIndex={currentIndex} />
                             <CryptoField label="Total Supply" value={`${(selectedCoin.total_supply / 1e6).toFixed(3) ?? 'N/A'}M`} currentIndex={currentIndex} />
                             <CryptoField label="Max Supply" value={selectedCoin.max_supply ? `${(selectedCoin.max_supply / 1e6).toFixed(2)}M` : '∞'} currentIndex={currentIndex} />
                             <CryptoField label="All Time High" value={`£${(selectedCoin.ath).toFixed(2)}`} currentIndex={currentIndex} />
@@ -516,12 +487,12 @@ const App: FC<CryptoDataProps> = () => {
 
               }
             </main>
-            <section className="fixed inset-0 z-40 top-25 md:top-0 transform 
-                transition-transform duration-300 translate-x-full
-                md:static col-span-full md:translate-x-0
-              bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 shadow-xl 
-                shadow-[#808080]/70 shrink-0 p-2 md:p-4 m-2 md:m-4 rounded-lg
-                overflow-y-auto touch-pan-y"
+            <section className="relative inset-0 z-40 top-25 md:top-0 
+              transform transition-transform duration-300
+              md:static col-span-full md:translate-x-0
+            bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 shadow-xl 
+              shadow-[#808080]/70 shrink-0 p-2 md:p-4 m-2 md:m-4 rounded-lg
+              overflow-y-auto touch-pan-y"
             >
               <div className={`relative pb-4 mb-2 border-b uppercase text-center font-semibold
                 ${themeConfig[currentIndex].label === 'Night' ? 'border-mist-200/20' : 'border-mist-900/20'}`}

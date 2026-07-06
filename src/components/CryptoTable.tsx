@@ -5,8 +5,6 @@ import type { CryptoTableProps, CryptoDataProps, CryptoDataPoint } from '@/types
 import SparkLine from './SparkLine';
 
 const CryptoRow = ({ coin, history }: { coin: CryptoDataProps, history: CryptoDataPoint[] }) => {
-
-
   return (
     <TableRow key={coin.id} className='font-semibold'>
       <TableCell className='flex'>
@@ -20,10 +18,16 @@ const CryptoRow = ({ coin, history }: { coin: CryptoDataProps, history: CryptoDa
       <TableCell>£{coin.current_price}</TableCell>
       <TableCell>£{coin.high_24h}</TableCell>
       <TableCell>£{coin.low_24h}</TableCell>
-      <TableCell className={`${coin.price_change_24h >= 0 ? 'text-emerald-400' : 'text-red-600'}`}>{coin.price_change_24h >= 0 ? '▲' : '▼'} £{coin.price_change_24h.toFixed(4)}</TableCell>
-      <TableCell>{(coin.total_volume / 1e9).toFixed(4)} B</TableCell>
-      <TableCell className={`${coin.price_change_percentage_24h >= 0 ? 'text-emerald-400' : 'text-red-600'}`}>{coin.price_change_percentage_24h >= 0 ? '▲' : '▼'} {coin.price_change_percentage_24h}%</TableCell>
-      <TableCell className={`${coin.market_cap_change_percentage_24h>= 0 ? 'text-emerald-400' : 'text-red-600'}`}>{coin.market_cap_change_percentage_24h >= 0 ? '▲' : '▼'} {coin.market_cap_change_percentage_24h}%</TableCell>
+      {/* <TableCell className={`${(coin.price_change_24h ?? 0) >= 0 ? 'text-emerald-400' : 'text-red-600'}`}>{coin.price_change_24h >= 0 ? '▲' : '▼'} £{coin.price_change_24h.toFixed(4)}</TableCell> */}
+      <TableCell>
+        { coin.price_change_24h === null
+          ? "£ N/A"
+          : `${coin.price_change_24h >= 0 ? "▲" : "▼"} £${coin.price_change_24h.toFixed(4)}`
+        }
+      </TableCell>
+      <TableCell>{((coin.total_volume) / 1e9).toFixed(4)} B</TableCell>
+      <TableCell className={`${coin.price_change_percentage_24h ?? 0 >= 0 ? 'text-emerald-400' : 'text-red-600'}`}>{coin.price_change_percentage_24h ?? 0 >= 0 ? '▲' : '▼'} {coin.price_change_percentage_24h}%</TableCell>
+      <TableCell className={`${coin.market_cap_change_percentage_24h ?? 0 >= 0 ? 'text-emerald-400' : 'text-red-600'}`}>{coin.market_cap_change_percentage_24h ?? 0 >= 0 ? '▲' : '▼'} {coin.market_cap_change_percentage_24h}%</TableCell>
       <TableCell className="text-right"><SparkLine data={history}/></TableCell>
     </TableRow>
   )

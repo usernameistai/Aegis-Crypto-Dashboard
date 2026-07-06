@@ -10,10 +10,10 @@ export interface CryptoDataProps {
   total_volume: number;
   high_24h: number;
   low_24h: number;
-  price_change_24h: number;
-  price_change_percentage_24h: number;
-  market_cap_change_24h: number; // new
-  market_cap_change_percentage_24h: number; // new
+  price_change_24h: number | null;
+  price_change_percentage_24h: number | null;
+  market_cap_change_24h: number | null; // new
+  market_cap_change_percentage_24h: number | null; // new
   circulating_supply: number;
   total_supply: number; // new
   max_supply: number;
