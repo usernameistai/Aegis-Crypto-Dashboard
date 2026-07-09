@@ -6,7 +6,7 @@ interface SparkLineProps {
 }
 
 const SparkLine = ({ data }: SparkLineProps) => {
-  console.log("Sparkline received:", data);
+  // console.log("Sparkline received:", data);
   
   return (
     <>

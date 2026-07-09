@@ -352,13 +352,24 @@ const App: FC<CryptoDataProps> = () => {
                   {selectedCoin ? (
                     <>
                       <div className="relative">
-                        <h2 
-                          id="Main-Data-Title"
-                          className={`flex justify-center md:justify-start pb-4 mb-4 text-base md:text-lg border-b
-                          ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 border-mist-200/20' : 'text-slate-700/80 border-mist-900/20'}`}
-                        >
-                          Aegis Crypto - {selectedCoin.name} ({selectedCoin.symbol.toUpperCase()}) Databoard
-                        </h2>
+                        <div className="flex justify-between">
+                          <h2 
+                            id="Main-Data-Title"
+                            className={`flex justify-center md:justify-start pb-4 mb-4 text-base md:text-lg border-b
+                            ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 border-mist-200/20' : 'text-slate-700/80 border-mist-900/20'}`}
+                          >
+                            Aegis Crypto - {selectedCoin.name} ({selectedCoin.symbol.toUpperCase()}) Databoard
+                          </h2>
+                          <div className={`hidden md:block ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80' : 'text-slate-700/80'}`}>
+                            <button popoverTarget="my-popover" className="bg-cyan-400 font-bold tracking-wider text-neutral-100 px-4 py-2 rounded-md shadow-lg/30 hover:bg-cyan-400/80 hover:shadow-none hover:translate-y-0.5 focus:translate-y-0.5 focus:shadow-none">
+                              Top 11 Crypto Coin
+                            </button>
+                            <div id="my-popover" popover="auto" className="top-25 md:scale-75 lg:scale-100 md:-left-35 lg:left-1/6">
+                                <CryptoTable coins={coins} historyData={sparkLineData} />
+                            </div>
+                          </div>
+
+                        </div>
 
                         <section aria-label="Crypto Data" className="bg-neutral-700/20 p-3.5 md:p-5 rounded-lg shadow-lg shadow-neutral-500/50">
                           <div className={`border-b-2 pb-5 mb-5 flex justify-between items-end ${themeConfig[currentIndex].label === 'Night' ? 'border-neutral-200/70' : ' border-neutral-600/70'}`}>
@@ -510,8 +521,29 @@ const App: FC<CryptoDataProps> = () => {
             </section>
 
           </div>
-        </div>
 
+          <section aria-label="Theme selection"
+            className={`flex backdrop-blur-md border border-white/10
+            rounded-md p-1 shadow-[0_4px_30px_rgba(0,0,0,0.1)] justify-between
+            ${themeConfig[currentIndex].label === 'Default' ? 'bg-neutral-400/50' : 'bg-white/5'}`}
+          >
+            {themeConfig.map((theme, idx) => (
+              <button
+                key={theme.label}
+                role="tab"
+                aria-pressed={currentIndex === idx ? true : false}
+                onClick={() => setCurrentIndex(idx)}
+                className={`px-2 py-1 text-[10px] md:text-[12px] lg:text-[14px] font-mono font-bold rounded-sm uppercase tracking-widest transition-all duration-300 hover:bg-white/10
+                  ${currentIndex === idx 
+                    ? 'bg-white/20 text-white shadow-[0_0_15px_rgba(255,255,255,0.2)]' 
+                    : 'text-white/70 hover:text-white hover:bg-white/30'
+                  }`}
+              >
+                {theme.label}
+              </button>
+            ))}
+          </section>
+        </div>
       </div>
       
     </>

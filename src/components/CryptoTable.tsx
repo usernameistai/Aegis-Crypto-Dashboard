@@ -26,8 +26,8 @@ const CryptoRow = ({ coin, history }: { coin: CryptoDataProps, history: CryptoDa
         }
       </TableCell>
       <TableCell>{((coin.total_volume) / 1e9).toFixed(4)} B</TableCell>
-      <TableCell className={`${coin.price_change_percentage_24h ?? 0 >= 0 ? 'text-emerald-400' : 'text-red-600'}`}>{coin.price_change_percentage_24h ?? 0 >= 0 ? '▲' : '▼'} {coin.price_change_percentage_24h}%</TableCell>
-      <TableCell className={`${coin.market_cap_change_percentage_24h ?? 0 >= 0 ? 'text-emerald-400' : 'text-red-600'}`}>{coin.market_cap_change_percentage_24h ?? 0 >= 0 ? '▲' : '▼'} {coin.market_cap_change_percentage_24h}%</TableCell>
+      <TableCell className={`${(coin.price_change_percentage_24h ?? 0) >= 0 ? 'text-emerald-400' : 'text-red-600'}`}>{(coin.price_change_percentage_24h ?? 0) >= 0 ? '▲' : '▼'} {coin.price_change_percentage_24h ?? 0}%</TableCell>
+      <TableCell className={`${(coin.market_cap_change_percentage_24h ?? 0) >= 0 ? 'text-emerald-400' : 'text-red-600'}`}>{(coin.market_cap_change_percentage_24h ?? 0) >= 0 ? '▲' : '▼'} {coin.market_cap_change_percentage_24h ?? 0}%</TableCell>
       <TableCell className="text-right"><SparkLine data={history}/></TableCell>
     </TableRow>
   )
@@ -37,7 +37,7 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ coins, historyData }: CryptoT
     
   return (
     <>
-      <div className="relative bg-white rounded-lg shadow-xl shadow-[#808080]/70 mx- my-5 px-3 py-2">
+      <div className="relative bg-white/70 rounded-lg shadow-xl shadow-[#808080]/70 mx-3 my-5 px-3 py-2">
         <Table className='text-slate-700/80'>
           <TableCaption className='top-0'>Top 11 Crypto Coins by rank</TableCaption>
           <TableHeader className='p-4 m-4'>
@@ -55,15 +55,15 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ coins, historyData }: CryptoT
             </TableRow>
           </TableHeader>
           <TableBody className='p-4 m-4'>
-            {coins.slice(0, 11).map((coin) => {
-              return <>
+            {coins.slice(0, 11).map((coin) => (
+              <>
                 <CryptoRow 
                   key={coin.id} 
                   coin={coin} 
                   history={historyData[coin.id] || []}
                 />
               </>
-            })}
+            ))}
           </TableBody>
         </Table>
       </div>
