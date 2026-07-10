@@ -226,15 +226,15 @@ const App: FC<CryptoDataProps> = () => {
             </label>
 
             <aside 
-              className="min-h-screen fixed inset-0 z-40 top-25 md:top-0 transform 
+              className="fixed md:static inset-0 z-40 top-25 md:top-0 transform 
                 transition-transform duration-300 translate-x-full peer-checked:translate-x-0 
-                md:static md:col-span-3 lg:col-span-2 md:translate-x-0 peer-checked:left-0 md:block
+                 md:col-span-3 lg:col-span-2 md:translate-x-0 peer-checked:left-0 md:block
               bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 shadow-xl 
                 shadow-[#808080]/70 shrink-0 p-2 md:p-4 m-2 md:m-4 rounded-lg
-                overflow-y-auto touch-pan-y"
+                overflow-y-auto overscroll-y-contain touch-pan-y"
               id="Crypto-Sidebar"
               aria-labelledby="Crypto-Menu-Title"
-            > { /*  added overflow-y-auto overflow-scroll */ }
+            >
 
               <div className={`relative pb-4 mb-2 border-b uppercase text-left font-semibold
                 ${themeConfig[currentIndex].label === 'Night' ? 'border-mist-200/20' : 'border-mist-900/20'}`}
