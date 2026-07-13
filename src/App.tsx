@@ -7,11 +7,6 @@ import CryptoTable from "./components/CryptoTable";
 import { themeConfig, preload_images } from "./config/themeConfig";
 import { LuSquareMenu } from "react-icons/lu";
 
-preload_images.forEach((src) => {
-  const img = new Image();
-  img.src = src;
-});
-
 const App: FC<CryptoDataProps> = () => {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [coins, setCoins] = useState<CryptoDataProps[]>([]);
@@ -30,10 +25,10 @@ const App: FC<CryptoDataProps> = () => {
   
   useEffect(() => {
     // Preload images into browser cache
-    // preload_images.forEach((src) => {
-    //   const img = new Image();
-    //   img.src = src;
-    // });
+    preload_images.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     window.scrollTo({
@@ -231,11 +226,11 @@ const App: FC<CryptoDataProps> = () => {
             </label>
 
             <aside 
-              className="fixed md:static z-40 top-25 right-0 bottom-0 left-0 md:top-0 transform 
+              className="min-h-dvh fixed md:static z-100 top-25 right-0 bottom-0 left-0 md:top-0 transform 
                 transition-transform duration-300 translate-x-full peer-checked:translate-x-0 
                  md:col-span-3 lg:col-span-2 md:translate-x-0 peer-checked:left-0
               bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 shadow-xl 
-                shadow-[#808080]/70 shrink-0 p-2 md:p-4 m-2 md:m-4 rounded-lg
+                shadow-[#808080]/70 p-2 md:p-4 m-2 md:m-4 rounded-lg
                 overflow-y-auto touch-pan-y overscroll-contain"
               id="Crypto-Sidebar"
               aria-labelledby="Crypto-Menu-Title"
@@ -346,7 +341,7 @@ const App: FC<CryptoDataProps> = () => {
               
             </aside>
 
-            <main className="relative col-span-12 md:col-span-9 lg:col-span-10
+            <main className="relative min-h-dvh col-span-12 md:col-span-9 lg:col-span-10
               bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 
               shadow-xl shadow-[#808080]/70 shrink-0 p-4 m-2 md:m-4 rounded-lg
               touch-pan-y overscroll-contain"
