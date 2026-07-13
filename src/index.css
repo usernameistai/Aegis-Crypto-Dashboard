@@ -86,28 +86,25 @@
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
   }
-  html {
-    scroll-behavior: smooth;
-  }
+
   body {
-    /* @apply bg-background text-foreground; */
     margin: 0;
-    min-height: 100vh;
-    transition: background-image 0.5s ease-in-out;
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+    box-sizing: border-box;
+    /* min-height: 100dvh; */
+    /* transition: background-image 0.5s ease-in-out; */
+    /* background-size: cover; */
+    /* background-position: center; */
+    /* background-attachment: fixed; */
   }
 }
 
 /* --- THEME CLASSES AND IMAGES --- */
-/* These classes now properly override the body background-image */
 .background { background-image: url('/background.webp'); }
 .background-nighttime { background-image: url('/backgroundNighttime.webp'); }
 .background-spring { background-image: url('/spring.webp'); }
 .background-summer { background-image: url('/summer.webp'); }
 .background-autumn { background-image: url('/autumn.webp'); }
-.background-winter { background-image: url('/winter.webp'); } /* Ensure correct paths */
+.background-winter { background-image: url('/winter.webp'); }
 
 .background, 
 .background-nighttime, 
@@ -115,11 +112,11 @@
 .background-summer, 
 .background-autumn, 
 .background-winter {
-  transition: background-image 0.6s ease-in-out;
+  transition: background-image 0.5s ease-in-out;
   will-change: background-image;
   background-size: cover;
   background-position: center;
-  background-attachment: fixed; /* Keeps it "mission" steady */
+  background-attachment: fixed;
 }
 
 /* --- LAYOUT UTILITIES --- */

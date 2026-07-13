@@ -51,18 +51,16 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ coins, historyData }: CryptoT
               <TableHead>Total Volume</TableHead>
               <TableHead>Price Change 24h</TableHead>
               <TableHead>Market Cap Change 24h</TableHead>
-              <TableHead className="text-right">Sparkline</TableHead>
+              <TableHead>Sparkline</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody className='p-4 m-4'>
             {coins.slice(0, 11).map((coin) => (
-              <>
-                <CryptoRow 
-                  key={coin.id} 
-                  coin={coin} 
-                  history={historyData[coin.id] || []}
-                />
-              </>
+              <CryptoRow 
+                key={coin.id} 
+                coin={coin} 
+                history={historyData[coin.id] || []}
+              />
             ))}
           </TableBody>
         </Table>

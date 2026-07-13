@@ -125,11 +125,11 @@ const CryptoChart = ({ data, days, onDaysChange }: CryptoChartProps) => {
                         }}
                         indicator="dot"
                         formatter={(value, name) => [
-                          <>
-                            <span className="p-1.25 rounded-xs bg-emerald-500"></span>
-                            <span className="font-semibold text-[#808080]">{name}</span>
-                            <span className="font-semibold">£{Number(value).toFixed(2).toLocaleString()}</span>,
-                          </>
+                          <div key={`${name}-${value}`}>
+                            <span className="px-1.25 py-px rounded-xs bg-emerald-500 mr-1">{' '}</span>
+                            <span className="font-semibold text-[#808080] mr-1">{name}</span>
+                            <span className="font-semibold">£{Number(value).toFixed(2).toLocaleString()}</span>
+                          </div>
                         ]}
                       />
                     }

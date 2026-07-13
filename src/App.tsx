@@ -7,6 +7,11 @@ import CryptoTable from "./components/CryptoTable";
 import { themeConfig, preload_images } from "./config/themeConfig";
 import { LuSquareMenu } from "react-icons/lu";
 
+preload_images.forEach((src) => {
+  const img = new Image();
+  img.src = src;
+});
+
 const App: FC<CryptoDataProps> = () => {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [coins, setCoins] = useState<CryptoDataProps[]>([]);
@@ -25,10 +30,10 @@ const App: FC<CryptoDataProps> = () => {
   
   useEffect(() => {
     // Preload images into browser cache
-    preload_images.forEach((src) => {
-      const img = new Image();
-      img.src = src;
-    });
+    // preload_images.forEach((src) => {
+    //   const img = new Image();
+    //   img.src = src;
+    // });
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     window.scrollTo({
@@ -38,7 +43,7 @@ const App: FC<CryptoDataProps> = () => {
   }, []);
 
   useEffect(() => {
-    document.body.className = `${themeConfig[currentIndex].className}`;
+    document.body.className = themeConfig[currentIndex].className;
   }, [currentIndex]);
 
   useEffect(() => {
@@ -151,13 +156,13 @@ const App: FC<CryptoDataProps> = () => {
   return (
     <>
       <div className="data-shield" aria-hidden={isLoading ? "true" : "false"}>
-        <div className="min-h-screen bg-neutral-200/20 antialiased overflow-x-hidden">
+        <div className="relative h-dvh bg-neutral-200/20 antialiased overflow-x-hidden">
           
           {isLoading && (
             <>
               <div role="status" aria-live="polite" aria-label="Loading Crypto Data"
                 className="fixed inset-0 w-screen h-screen bg-neutral-900/80 
-                flex flex-col items-center justify-center z-9999 backdrop-blur-sm text-white">
+                flex flex-col items-center justify-center z-200 backdrop-blur-sm text-white">
                 <p className="animate-pulse font-mono tracking-[0.3em] uppercase mb-4">
                   Syncing Crypto Data...
                 </p>
@@ -203,7 +208,7 @@ const App: FC<CryptoDataProps> = () => {
             Aegis Crypto Dashboard
           </h1>
 
-          <div className="grid grid-cols-12 w-full overflow-x-hidden">
+          <div className="relative grid grid-cols-12">
             <input 
               type="checkbox" 
               id="menu-toggle" 
@@ -226,12 +231,12 @@ const App: FC<CryptoDataProps> = () => {
             </label>
 
             <aside 
-              className="fixed md:static inset-0 z-40 top-25 md:top-0 transform 
+              className="fixed md:static z-40 top-25 right-0 bottom-0 left-0 md:top-0 transform 
                 transition-transform duration-300 translate-x-full peer-checked:translate-x-0 
-                 md:col-span-3 lg:col-span-2 md:translate-x-0 peer-checked:left-0 md:block
+                 md:col-span-3 lg:col-span-2 md:translate-x-0 peer-checked:left-0
               bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 shadow-xl 
                 shadow-[#808080]/70 shrink-0 p-2 md:p-4 m-2 md:m-4 rounded-lg
-                overflow-y-auto overscroll-y-contain touch-pan-y"
+                overflow-y-auto touch-pan-y overscroll-contain"
               id="Crypto-Sidebar"
               aria-labelledby="Crypto-Menu-Title"
             >
@@ -287,7 +292,7 @@ const App: FC<CryptoDataProps> = () => {
                 >
                   Search
                 </button>
-                {/* Only show the list if the user has typed something */}
+                
                 {search && filteredCoins.length > 0 && (
                   <div 
                     id="Crypto-Coin-List"
@@ -313,13 +318,13 @@ const App: FC<CryptoDataProps> = () => {
                 )}
               </form>
               
-              {coins && 
+             {coins && 
                 <nav aria-label="Crypto Coin Selection">
                   <ul className="flex flex-col gap-y-2 text-slate-700/80">
                     {coins.slice(0, 11).map((c) => (
                       <li key={c.id}>
                         <button 
-                          className={`w-full uppercase my-1 ml-2 md:ml-0 px-4 md:px-4 py-2 text-left text-[16px] 
+                          className={`w-90 md:w-full uppercase my-1 ml-2 md:ml-0 px-4 md:px-4 py-2 text-left text-[16px] 
                             md:text-base font-semibold border-[1.5px] border-mist-400/10 rounded-lg bg-white/10
                             hover:text-white hover:bg-teal-300/20 hover:border-mist-100/50
                             ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80' : 'text-slate-700/80'}
@@ -341,9 +346,10 @@ const App: FC<CryptoDataProps> = () => {
               
             </aside>
 
-            <main className="min-h-screen col-span-12 md:col-span-9 lg:col-span-10
+            <main className="relative col-span-12 md:col-span-9 lg:col-span-10
               bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 
-              shadow-xl shadow-[#808080]/70 shrink-0 p-4 m-2 md:m-4 rounded-lg"
+              shadow-xl shadow-[#808080]/70 shrink-0 p-4 m-2 md:m-4 rounded-lg
+              touch-pan-y overscroll-contain"
             >
               {priceData &&
                 <section aria-labelledby="Main-Data-Title"
@@ -364,7 +370,7 @@ const App: FC<CryptoDataProps> = () => {
                             <button popoverTarget="my-popover" className="bg-cyan-400 font-bold tracking-wider text-neutral-100 px-4 py-2 rounded-md shadow-lg/30 hover:bg-cyan-400/80 hover:shadow-none hover:translate-y-0.5 focus:translate-y-0.5 focus:shadow-none">
                               Top 11 Crypto Coin
                             </button>
-                            <div id="my-popover" popover="auto" className="top-25 md:scale-75 lg:scale-100 md:-left-35 lg:left-1/6">
+                            <div id="my-popover" popover="auto" className="bg-transparent top-25 md:scale-75 lg:scale-100 md:-left-35 lg:left-1/6 touch-auto">
                                 <CryptoTable coins={coins} historyData={sparkLineData} />
                             </div>
                           </div>
@@ -372,8 +378,8 @@ const App: FC<CryptoDataProps> = () => {
                         </div>
 
                         <section aria-label="Crypto Data" className="bg-neutral-700/20 p-3.5 md:p-5 rounded-lg shadow-lg shadow-neutral-500/50">
-                          <div className={`border-b-2 pb-5 mb-5 flex justify-between items-end ${themeConfig[currentIndex].label === 'Night' ? 'border-neutral-200/70' : ' border-neutral-600/70'}`}>
-                            <div>
+                          <div className={` border-b-2 pb-5 mb-5 flex justify-between items-end ${themeConfig[currentIndex].label === 'Night' ? 'border-neutral-200/70' : ' border-neutral-600/70'}`}>
+                            <div className="">
                               <h3 className="flex items-center gap-1 text-xl md:text-3xl font-black text-white uppercase tracking-wide md:tracking-tighter">
                                 <img 
                                   src={selectedCoin.image} 
@@ -390,7 +396,7 @@ const App: FC<CryptoDataProps> = () => {
                             </div>
                           </div>
 
-                          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-5 mb-5">
+                          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-5 mb-5 touch-auto">
                             <CryptoField label="24h Change" value={`${(selectedCoin.price_change_percentage_24h ?? 0).toFixed(2)}%`} subMetric={+((selectedCoin.price_change_24h ?? 0).toFixed(5))} currentIndex={currentIndex} />
                             <CryptoField label="24h High" value={`£${selectedCoin.high_24h}`} currentIndex={currentIndex} />
                             <CryptoField label="24h Low" value={`£${selectedCoin.low_24h}`} currentIndex={currentIndex} />
@@ -437,7 +443,7 @@ const App: FC<CryptoDataProps> = () => {
                         />
 
                         <section aria-label="Crypto Data Two" className="bg-neutral-700/20 p-3.5 md:p-5 mt-5 rounded-lg shadow-lg shadow-neutral-500/50">
-                          <div className={` lg:hidden border-b-2 pb-2 md:pb-5 mb-3 md:mb-5 flex justify-between items-end ${themeConfig[currentIndex].label === 'Night' ? 'border-neutral-200/70' : ' border-neutral-600/70'}`}>
+                          <div className={`lg:hidden border-b-2 pb-2 md:pb-5 mb-3 md:mb-5 flex justify-between items-end ${themeConfig[currentIndex].label === 'Night' ? 'border-neutral-200/70' : ' border-neutral-600/70'}`}>
                             
                             <label 
                               htmlFor="crypto-toggle" 
@@ -445,7 +451,7 @@ const App: FC<CryptoDataProps> = () => {
                               role="button"
                               aria-label="Toggle for more Crypto Info"
                             >
-                              <div>
+                              <div className="">
                                 <h3 className="flex items-center gap-1 text-xl md:text-3xl font-black text-white uppercase tracking-wide md:tracking-tighter">
                                   <img 
                                     src={selectedCoin.image} 
@@ -487,6 +493,7 @@ const App: FC<CryptoDataProps> = () => {
                             <CryptoField label="All Time Low % Change" value={`${selectedCoin.atl_change_percentage.toFixed(2) ?? '0'}%`} currentIndex={currentIndex} />
                           </div>
                         </section>
+                        
                       </div>
                     </>
                   ) : (
@@ -498,6 +505,7 @@ const App: FC<CryptoDataProps> = () => {
 
               }
             </main>
+            
             <section className="relative inset-0 z-40 top-25 md:top-0 
               transform transition-transform duration-300
               md:static col-span-full md:translate-x-0
