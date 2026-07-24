@@ -37,7 +37,7 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ coins, historyData }: CryptoT
     
   return (
     <>
-      <div className="relative bg-white/70 rounded-lg shadow-xl shadow-[#808080]/70 mx-3 my-5 px-3 py-2">
+      <div className="relative bg-white/80 rounded-lg shadow-xl shadow-[#808080]/70 mx-3 my-5 px-3 py-2">
         <Table className='text-slate-700/80'>
           <TableCaption className='top-0'>Top 11 Crypto Coins by rank</TableCaption>
           <TableHeader className='p-4 m-4'>

@@ -147,7 +147,6 @@ const App: FC<CryptoDataProps> = () => {
     }, 200);
   };
   
-
   return (
     <>
       <div className="data-shield" aria-hidden={isLoading ? "true" : "false"}>
@@ -212,7 +211,7 @@ const App: FC<CryptoDataProps> = () => {
             />
             <label 
               htmlFor="menu-toggle" 
-              className="touch-manipulation md:hidden p-2 fixed top-18 left-2 z-50 
+              className="touch-manipulation md:hidden p-2 fixed top-19 left-4 z-50 
                 bg-neutral900/50 backdrop-blur-sm border border-white/10 text-teal-500
                 rounded-lg cursor-pointer flex items-center gap-2"
               role="button"
@@ -230,7 +229,7 @@ const App: FC<CryptoDataProps> = () => {
                 transition-transform duration-300 translate-x-full peer-checked:translate-x-0 
                  md:col-span-3 lg:col-span-2 md:translate-x-0 peer-checked:left-0
               bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 shadow-xl 
-                shadow-[#808080]/70 p-2 md:p-4 m-2 md:m-4 rounded-lg
+                shadow-[#808080]/70 p-2 md:p-4 m-4 rounded-lg
                 overflow-y-auto touch-pan-y overscroll-contain"
               id="Crypto-Sidebar"
               aria-labelledby="Crypto-Menu-Title"
@@ -343,7 +342,7 @@ const App: FC<CryptoDataProps> = () => {
 
             <main className="relative min-h-dvh col-span-12 md:col-span-9 lg:col-span-10
               bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 
-              shadow-xl shadow-[#808080]/70 shrink-0 p-4 m-2 md:m-4 rounded-lg
+              shadow-xl shadow-[#808080]/70 shrink-0 p-4 m-4 rounded-lg
               touch-pan-y overscroll-contain"
             >
               {priceData &&
@@ -354,8 +353,7 @@ const App: FC<CryptoDataProps> = () => {
                     <>
                       <div className="relative">
                         <div className="flex justify-between">
-                          <h2 
-                            id="Main-Data-Title"
+                          <h2 id="Main-Data-Title"
                             className={`flex justify-center md:justify-start pb-4 mb-4 text-base md:text-lg border-b
                             ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 border-mist-200/20' : 'text-slate-700/80 border-mist-900/20'}`}
                           >
@@ -505,7 +503,7 @@ const App: FC<CryptoDataProps> = () => {
               transform transition-transform duration-300
               md:static col-span-full md:translate-x-0
             bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 shadow-xl 
-              shadow-[#808080]/70 shrink-0 p-2 md:p-4 m-2 md:m-4 rounded-lg
+              shadow-[#808080]/70 shrink-0 p-2 md:p-4 m-4 rounded-lg
               overflow-y-auto touch-pan-y"
             >
               <div className={`relative pb-4 mb-2 border-b uppercase text-center font-semibold
