@@ -15,8 +15,8 @@ export interface CryptoDataProps {
   market_cap_change_24h: number | null; // new
   market_cap_change_percentage_24h: number | null; // new
   circulating_supply: number;
-  total_supply: number; // new
-  max_supply: number;
+  total_supply: number; // added | null
+  max_supply: number | null; // added | null
   ath: number; // new
   ath_change_percentage: number; // new
   ath_date: string; // new
@@ -27,6 +27,35 @@ export interface CryptoDataProps {
   sparkline_in_7d: {
     price: number[];
   }
+};
+
+export interface CryptoTrendsProps {
+  id: string;
+  coin_id: number;
+  name: string;
+  symbol: string;
+  market_cap_rank: number;
+  thumb: string;
+  small: string;
+  large: string;
+  slug: string;
+  price_btc: number;
+  score: number;
+  data: {
+    price: number;
+    price_btc: string;
+    market_cap: string;
+    market_cap_btc: string;
+    total_volume: string;
+    total_volume_btc: string;
+    sparkline: string;
+  };
+};
+
+export interface TrendingCoins {
+  coins: {
+    item: CryptoTrendsProps;
+  }[];
 };
 
 export interface CryptoDataHistory {
@@ -53,4 +82,5 @@ export interface PriceResponse {
 export interface CryptoTableProps {
   coins: CryptoDataProps[];
   historyData: Record<string, CryptoDataPoint[]>;
+  trends: CryptoTrendsProps[];
 };

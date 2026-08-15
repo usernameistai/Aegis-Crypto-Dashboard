@@ -1,11 +1,13 @@
 import React, { useEffect, useMemo, useState, useRef, type FC } from "react";
 import axios from "axios";
-import type { CryptoDataProps, CryptoDataHistory, PriceResponse, CryptoDataPoint } from "./types/cryptoDataTypes";
+import type { CryptoDataProps, CryptoTrendsProps, CryptoDataHistory, PriceResponse, CryptoDataPoint, TrendingCoins } from "./types/cryptoDataTypes";
 import CryptoChart from "./components/CryptoChart";
 import CryptoField from "./components/CryptoField";
 import CryptoTable from "./components/CryptoTable";
 import { themeConfig, preload_images } from "./config/themeConfig";
 import { LuSquareMenu } from "react-icons/lu";
+import { ChartCandlestick, Flame, TrendingUp, TrendingUpDown } from "lucide-react";
+import TrendSparkLine from "./components/TrendSparkLine";
 
 const App: FC<CryptoDataProps> = () => {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
@@ -13,6 +15,7 @@ const App: FC<CryptoDataProps> = () => {
   const [selectedCoin, setSelectedCoin] = useState<CryptoDataProps | null>(null);
   const [priceData, setPriceData] = useState<PriceResponse | null>(null);
   const [params, setParams] = useState<CryptoDataHistory>({ id: `bitcoin`, currency: 'gbp', days: 90 });
+  const [trends, setTrends] = useState<CryptoTrendsProps[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [isOpen, setIsOpen] = useState(false);
@@ -21,7 +24,8 @@ const App: FC<CryptoDataProps> = () => {
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const url1 = useMemo(() => `https://api.coingecko.com/api/v3/coins/markets?vs_currency=gbp&order=market_cap_desc&per_page=250&page=1&sparkline=true`, []);
-  const url2 = useMemo(() =>`https://api.coingecko.com/api/v3/coins/${params.id}/market_chart?vs_currency=${params.currency}&days=${params.days}`, [params]);
+  const url2 = useMemo(() => `https://api.coingecko.com/api/v3/coins/${params.id}/market_chart?vs_currency=${params.currency}&days=${params.days}`, [params.id, params.currency, params.days]);
+  const trendingUrl = useMemo(() => `https://api.coingecko.com/api/v3/search/trending`, []);
   
   useEffect(() => {
     // Preload images into browser cache
@@ -40,6 +44,26 @@ const App: FC<CryptoDataProps> = () => {
   useEffect(() => {
     document.body.className = themeConfig[currentIndex].className;
   }, [currentIndex]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchTrends = async () => {
+      setIsLoading(true);
+      try {
+        const res = await axios.get<TrendingCoins>(trendingUrl, { signal: controller.signal });
+        // console.log(res.data.coins, "data");
+        setTrends(res.data.coins.map(coin => coin.item));
+      } catch (err) {
+        if (!axios.isCancel(err)) console.error("Coin trend list fetch error", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchTrends();
+    return () => controller.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const controller  = new AbortController();
@@ -67,7 +91,7 @@ const App: FC<CryptoDataProps> = () => {
       setPriceData(null);
       setIsLoading(true);
       try {
-        const res = await axios.get(url2, { signal: controller.signal });
+        const res = await axios.get<PriceResponse>(url2, { signal: controller.signal });
         setPriceData(res.data);
       } catch (err) {
         if (!axios.isCancel(err)) console.error("Coin list fetch error", err);
@@ -78,31 +102,46 @@ const App: FC<CryptoDataProps> = () => {
     fetchCryptoChartData();
     return () => controller.abort();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params]);
+  }, [url2]);
 
   const sparkLineData = useMemo(() => {
     const result: Record<string, CryptoDataPoint[]> = {};
 
     coins.forEach((coin) => {
-      if (!coin.sparkline_in_7d?.price) return;
+      // if (!coin.sparkline_in_7d?.price) return;
 
-      result[coin.id] = coin.sparkline_in_7d.price.map((p: number, i: number) => ({
-        date: new Date(Date.now() - (7 - i) * 3600 * 1000).toISOString(),
-        price: p,
+      // result[coin.id] = coin.sparkline_in_7d.price.map((p: number, i: number) => ({
+      //   date: new Date(Date.now() - (coin.sparkline_in_7d!.price.length - 7 - i) * 24 * 3600 * 1000).toISOString(),
+      //   price: p,
+      // }));
+
+      const prices = coin.sparkline_in_7d?.price;
+
+      if (!prices) return;
+
+      const interval = (7 * 24 * 60 * 60 * 1000) / prices.length;
+
+      result[coin.id] = prices.map((price, i) => ({
+        date: new Date(
+          Date.now() - (prices.length - 1 - i) * interval
+        ).toISOString(),
+        price,
       }));
     });
+    // added coins.sparkline_in_7d!.price.length -
 
     return result;
   }, [coins]);
 
   const formattedData = useMemo(() => {
     if (!priceData?.prices) return [];
-    return priceData 
-      ? priceData.prices.map(([timestamp, price]) => ({ // : [number, number]
+    // return priceData 
+    //   ?
+    return priceData.prices.map(([timestamp, price]) => ({ // : [number, number]
         date: new Date(timestamp).toISOString(),
         price: price,
-        }))
-      : [];
+      }));
+      // : [];
   }, [priceData]);
 
   const filteredCoins = useMemo(() => {
@@ -110,6 +149,22 @@ const App: FC<CryptoDataProps> = () => {
 
     return coins.filter((c) => c.name.toLowerCase().includes(search.toLowerCase()));
   }, [search, coins]);
+
+  const handleCryptoTrend = (trend: CryptoTrendsProps ) => {    
+    const coin = coins.find((coin) => coin.id === trend.id);
+
+    if (!coin) {
+      console.log(`No matching coin found for ${trend.id}`);
+      return;
+    };
+    setSelectedCoin(coin);
+    setParams((prev) => ({
+      ...prev,
+      id: coin.id,
+    }));
+    if (menuRef.current) menuRef.current.checked = false;
+    
+  };
 
   const handleSelectCoin = (coin: CryptoDataProps) => { 
     setSelectedCoin(coin);
@@ -202,6 +257,55 @@ const App: FC<CryptoDataProps> = () => {
             Aegis Crypto Dashboard
           </h1>
 
+          {/* Trending Crypto Coins */}
+          <section className={`flex bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 shadow-xl 
+            shadow-[#808080]/60 p-2 md:p-4 m-4 rounded-lg
+            ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 ' : 'text-slate-700/80'}`}
+          >
+            <div className="flex w-full flex-col items-center">
+              <div className={`flex w-full items-center border-b mb-2 pb-2
+                ${themeConfig[currentIndex].label === 'Night' ? 'border-mist-200/20' : 'border-mist-900/20'}
+              `}>
+                <Flame className="h-5 w-5 text-orange-500 mr-1" strokeWidth={3}/>
+                <h2 className="text-base md:text-lg uppercase font-semibold">
+                  Trending Aegis Crypto
+                </h2>
+              </div>
+              <div className="flex w-full items-center gap-1">
+                {trends.slice(0, 8).map((trend, index) => (
+                  <button key={trend.id} 
+                    className={`flex flex-1 items-center justify-between border border-white/10 bg-[#808080]/20 px-2 py-1 
+                      rounded-lg shadow-md hover:border-cyan-400 gap-1 hover:bg-white/10 cursor-pointer
+                      focus:outline-none focus:ring-2 focus:ring-cyan-400
+                      ${ index <= 1 
+                          ? "flex"
+                          : index <= 4 
+                            ? "hidden md:flex"
+                            : "hidden lg:flex"
+                      }
+                    `}
+                    onClick={() => handleCryptoTrend(trend)}
+                  >
+                    <img 
+                      src={trend.small} 
+                      alt={trend.name} 
+                      className="w-5 h-5 md:w-8 md:h-8 my-auto"
+                    />
+                    <div className="flex flex-col items-center leading-tight">
+                      <span className="text-[11px] md:text-xs lg:text-sm hidden md:flex">{trend.name}</span>
+                      <span className="text-[9px] md:text-[11px] lg:text-xs">{trend.symbol}</span>
+                    </div>
+                    <TrendSparkLine 
+                      src={trend.data.sparkline} 
+                      className="w-15 h-10 pl-2"
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Menu Select for Coins */}
           <div className="relative grid grid-cols-12">
             <input 
               type="checkbox" 
@@ -223,7 +327,7 @@ const App: FC<CryptoDataProps> = () => {
               <div><LuSquareMenu size={24}/></div> 
               <div className="ml-1 font-mono font-semibold uppercase tracking-wider">Crypto Sidebar</div>
             </label>
-
+            
             <aside 
               className="min-h-dvh fixed md:static z-100 top-25 right-0 bottom-0 left-0 md:top-0 transform 
                 transition-transform duration-300 translate-x-full peer-checked:translate-x-0 
@@ -238,14 +342,17 @@ const App: FC<CryptoDataProps> = () => {
               <div className={`relative pb-4 mb-2 border-b uppercase text-left font-semibold
                 ${themeConfig[currentIndex].label === 'Night' ? 'border-mist-200/20' : 'border-mist-900/20'}`}
               >
-                <h2 
-                  id="Crypto-Menu-Title"
-                  className={`text-base md:text-lg
-                    ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 ' : 'text-slate-700/80'}
-                  `}
-                >
-                  Crypto // Assets
-                </h2>
+                <div className="flex items-center">
+                  <ChartCandlestick className="mr-1 text-teal-500"/>
+                  <h2 
+                    id="Crypto-Menu-Title"
+                    className={`text-base md:text-lg
+                      ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 ' : 'text-slate-700/80'}
+                    `}
+                  >
+                    Crypto Coin
+                  </h2>
+                </div>
               </div>
 
               <form
@@ -257,7 +364,7 @@ const App: FC<CryptoDataProps> = () => {
                   setSearch('');
                 }}
               >
-                <label htmlFor="search" className="sr-only"></label>
+                <label htmlFor="search" className="sr-only">Search for a Cryptocurrency</label>
                 <input 
                   type="search"
                   value={search}
@@ -268,16 +375,16 @@ const App: FC<CryptoDataProps> = () => {
                   aria-expanded={search.length > 0 && filteredCoins.length > 0}
                   aria-controls="Crypto-Coin-List"
                   placeholder="Enter Crypto Coin"
-                  className="bg-neutral-100 px-2 md:px-4 py-1 md:py-2 my-2 text-base
+                  className="w-[95%] md:w-full bg-neutral-100 px-4 py-2 m-2 md:m-0 md:my-2 text-base
                     border border-neutral-300/50 focus:outline-none focus:ring-2
-                  focus:ring-cyan-500 rounded-sm w-full inset-shadow-xl inset-shadow-black"
+                  focus:ring-cyan-500 rounded-sm inset-shadow-xl inset-shadow-black"
                   onChange={handleSearchChange}
                   onBlur={handleBlur}
                 />
                 <button
                   type="submit"
-                  className="px-4 py-2 mb-4 text-neutral-100 text-base md:text-[17.5px] 
-                    uppercase font-semibold bg-teal-500 hover:bg-teal-500/80 rounded-sm w-full 
+                  className="w-[95%] md:w-full px-4 py-2 mx-2 md:mx-0 mb-4 text-neutral-100 text-base md:text-[17.5px] 
+                    uppercase font-semibold bg-teal-500 hover:bg-teal-500/80 rounded-sm 
                     tracking-wider shadow-lg/30 hover:shadow-none hover:translate-y-0.5 
                     focus:translate-y-0.5 focus:shadow-none"
                   onClick={() => {
@@ -318,7 +425,7 @@ const App: FC<CryptoDataProps> = () => {
                     {coins.slice(0, 11).map((c) => (
                       <li key={c.id}>
                         <button 
-                          className={`w-90 md:w-full uppercase my-1 ml-2 md:ml-0 px-4 md:px-4 py-2 text-left text-[16px] 
+                          className={`w-[95%] md:w-full uppercase my-1 ml-2 md:ml-0 px-4 md:px-4 py-2 text-left text-[16px] 
                             md:text-base font-semibold border-[1.5px] border-mist-400/10 rounded-lg bg-white/10
                             hover:text-white hover:bg-teal-300/20 hover:border-mist-100/50
                             ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80' : 'text-slate-700/80'}
@@ -340,6 +447,7 @@ const App: FC<CryptoDataProps> = () => {
               
             </aside>
 
+            {/* Main Data Dashboard */}
             <main className="relative min-h-dvh col-span-12 md:col-span-9 lg:col-span-10
               bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 
               shadow-xl shadow-[#808080]/70 shrink-0 p-4 m-4 rounded-lg
@@ -353,18 +461,19 @@ const App: FC<CryptoDataProps> = () => {
                     <>
                       <div className="relative">
                         <div className="flex justify-between">
-                          <h2 id="Main-Data-Title"
+                          <div id="Main-Data-Title"
                             className={`flex justify-center md:justify-start pb-4 mb-4 text-base md:text-lg border-b
-                            ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 border-mist-200/20' : 'text-slate-700/80 border-mist-900/20'}`}
+                              ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 border-mist-200/20' : 'text-slate-700/80 border-mist-900/20'}`}
                           >
-                            Aegis Crypto - {selectedCoin.name} ({selectedCoin.symbol.toUpperCase()}) Databoard
-                          </h2>
+                            <TrendingUpDown className="w-6 h-6 text-emerald-500 mr-2" strokeWidth={2.75} />
+                            <h2>Aegis Crypto - {selectedCoin.name} ({selectedCoin.symbol.toUpperCase()}) Databoard </h2>
+                          </div>
                           <div className={`hidden md:block ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80' : 'text-slate-700/80'}`}>
-                            <button popoverTarget="my-popover" className="bg-cyan-400 font-bold tracking-wider text-neutral-100 px-4 py-2 rounded-md shadow-lg/30 hover:bg-cyan-400/80 hover:shadow-none hover:translate-y-0.5 focus:translate-y-0.5 focus:shadow-none">
+                            <button popoverTarget="my-popover" className="bg-teal-500 font-bold tracking-wider text-neutral-100 px-4 py-2 rounded-md shadow-lg/30 hover:bg-teal-500/80 hover:shadow-none hover:translate-y-0.5 focus:translate-y-0.5 focus:shadow-none">
                               Top 11 Crypto Coin
                             </button>
                             <div id="my-popover" popover="auto" className="bg-transparent top-25 md:scale-75 lg:scale-100 md:-left-35 lg:left-1/6 touch-auto">
-                                <CryptoTable coins={coins} historyData={sparkLineData} />
+                                <CryptoTable coins={coins} historyData={sparkLineData} trends={trends} />
                             </div>
                           </div>
 
@@ -509,16 +618,24 @@ const App: FC<CryptoDataProps> = () => {
               <div className={`relative pb-4 mb-2 border-b uppercase text-center font-semibold
                 ${themeConfig[currentIndex].label === 'Night' ? 'border-mist-200/20' : 'border-mist-900/20'}`}
               >
-                <h2 
-                  id="Crypto-Menu-Title"
-                  className={`text-base md:text-lg
-                    ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 ' : 'text-slate-700/80'}
-                  `}
-                >
-                  Top 11 Crypto Coins by rank
-                </h2>
+                <div className="flex justify-center">
+                  <TrendingUp className="w-8 h-8 text-emerald-500 mr-2"/>
+                  <h2 
+                    id="Crypto-Menu-Title"
+                    className={`text-base md:text-lg
+                      ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 ' : 'text-slate-700/80'}
+                    `}
+                  >
+                    Top 11 Crypto Coins by rank
+                  </h2>
+
+                </div>
               </div>
-              <CryptoTable coins={coins} historyData={sparkLineData} />
+              <CryptoTable 
+                coins={coins} 
+                historyData={sparkLineData}
+                trends={trends} 
+              />
             </section>
 
           </div>
