@@ -90,12 +90,30 @@
   body {
     margin: 0;
     box-sizing: border-box;
-    /* min-height: 100dvh; */
     transition: background-image 0.5s ease-in-out;
-    /* background-size: cover; */
-    /* background-position: center; */
-    /* background-attachment: fixed; */
   }
+}
+
+/* --- Toast Styles --- */
+.toast {
+  border-radius: 10px !important;
+  font-family: "Inter", sans-serif !important;
+  background-color: #80808080 !important;
+  color: aqua !important;
+  font-weight: 500 !important;
+  font-size: large !important;
+}
+.progress {
+  background: linear-gradient(
+    to right,
+    aqua,
+    #6366f1,
+    #a855f7,
+    #ec4899,
+    #a855f7,
+    #6366f1,
+    aqua
+  ) !important;   
 }
 
 /* --- THEME CLASSES AND IMAGES --- */

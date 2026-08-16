@@ -14,7 +14,7 @@ const CryptoChart = ({ data, days, onDaysChange }: CryptoChartProps) => {
 
   return (
     <>
-      <Card className="pt-0 shadow-xl shadow-[#808080]/70 border-b-2 border-r-2 border-neutral-200/70">
+      <Card className="pt-0 shadow-xl shadow-[#808080]/70 bg-white/90 border-b-2 border-r-2 border-neutral-200/70">
         <CardHeader className="flex items-center gap-2 space-y-0 border-b border-teal-700/70 py-5 sm:flex-row">
           
           <div className="grid flex-1 gap-1">

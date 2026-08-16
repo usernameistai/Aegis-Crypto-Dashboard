@@ -6,10 +6,11 @@ import CryptoField from "./components/CryptoField";
 import CryptoTable from "./components/CryptoTable";
 import { themeConfig, preload_images } from "./config/themeConfig";
 import { LuSquareMenu } from "react-icons/lu";
-import { ChartCandlestick, Flame, TrendingUp, TrendingUpDown } from "lucide-react";
+import { ChartCandlestick, Flame, LayoutDashboard, TrendingUp, TrendingUpDown } from "lucide-react";
 import TrendSparkLine from "./components/TrendSparkLine";
+import { Flip, ToastContainer, toast } from 'react-toastify';
 
-const App: FC<CryptoDataProps> = () => {
+const App: FC = () => {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [coins, setCoins] = useState<CryptoDataProps[]>([]);
   const [selectedCoin, setSelectedCoin] = useState<CryptoDataProps | null>(null);
@@ -60,7 +61,14 @@ const App: FC<CryptoDataProps> = () => {
         setIsLoading(false);
       }
     }
-    fetchTrends();
+    toast.promise(
+      fetchTrends(),
+      {
+        pending: "Trending Data Fetching",
+        success: "Well Slap My Thighs and call me Shirley",
+        error: "I'm sory Dave..."
+      }
+    )
     return () => controller.abort();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -101,7 +109,6 @@ const App: FC<CryptoDataProps> = () => {
     };
     fetchCryptoChartData();
     return () => controller.abort();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url2]);
 
   const sparkLineData = useMemo(() => {
@@ -155,6 +162,7 @@ const App: FC<CryptoDataProps> = () => {
 
     if (!coin) {
       console.log(`No matching coin found for ${trend.id}`);
+      toast.warn(`No matching coin data found for ${trend.id}`);
       return;
     };
     setSelectedCoin(coin);
@@ -249,6 +257,18 @@ const App: FC<CryptoDataProps> = () => {
               </button>
             ))}
           </section>
+          <ToastContainer 
+            theme="dark" 
+            position="top-right"
+            closeOnClick
+            draggable
+            stacked
+            newestOnTop
+            transition={Flip}
+            toastClassName="toast"
+            progressClassName="progress"
+            autoClose={1250}
+          />
           
           <h1 className={`top-0 mt-3 mb-10 md:my-3 text-center text-[#808080]
             text-xl md:text-4xl uppercase font-black tracking-[0.225em]
@@ -315,7 +335,7 @@ const App: FC<CryptoDataProps> = () => {
             />
             <label 
               htmlFor="menu-toggle" 
-              className="touch-manipulation md:hidden p-2 fixed top-19 left-4 z-50 
+              className="touch-manipulation md:hidden p-2 fixed top-17 left-4 z-50 
                 bg-neutral900/50 backdrop-blur-sm border border-white/10 text-teal-500
                 rounded-lg cursor-pointer flex items-center gap-2"
               role="button"
@@ -385,7 +405,7 @@ const App: FC<CryptoDataProps> = () => {
                   type="submit"
                   className="w-[95%] md:w-full px-4 py-2 mx-2 md:mx-0 mb-4 text-neutral-100 text-base md:text-[17.5px] 
                     uppercase font-semibold bg-teal-500 hover:bg-teal-500/80 rounded-sm 
-                    tracking-wider shadow-lg/30 hover:shadow-none hover:translate-y-0.5 
+                    tracking-wider shadow-md/30 hover:shadow-none hover:translate-y-0.5 
                     focus:translate-y-0.5 focus:shadow-none"
                   onClick={() => {
                     if (menuRef.current) menuRef.current.checked = false;
@@ -460,19 +480,25 @@ const App: FC<CryptoDataProps> = () => {
                   {selectedCoin ? (
                     <>
                       <div className="relative">
-                        <div className="flex justify-between">
+                        <div className={`flex items-center justify-between text-base md:text-lg md:border-b md:mb-4 pb-2
+                              ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 border-mist-200/20' : 'text-slate-700/80 border-mist-900/20'}`}>
                           <div id="Main-Data-Title"
-                            className={`flex justify-center md:justify-start pb-4 mb-4 text-base md:text-lg border-b
-                              ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 border-mist-200/20' : 'text-slate-700/80 border-mist-900/20'}`}
+                            className="flex justify-center md:justify-start"
                           >
                             <TrendingUpDown className="w-6 h-6 text-emerald-500 mr-2" strokeWidth={2.75} />
-                            <h2>Aegis Crypto - {selectedCoin.name} ({selectedCoin.symbol.toUpperCase()}) Databoard </h2>
+                            <h2><div className="hidden md:inline-block"> Aegis Crypto - </div> {selectedCoin.name} ({selectedCoin.symbol.toUpperCase()}) <div className="hidden md:inline-block">Databoard</div> </h2>
                           </div>
-                          <div className={`hidden md:block ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80' : 'text-slate-700/80'}`}>
-                            <button popoverTarget="my-popover" className="bg-teal-500 font-bold tracking-wider text-neutral-100 px-4 py-2 rounded-md shadow-lg/30 hover:bg-teal-500/80 hover:shadow-none hover:translate-y-0.5 focus:translate-y-0.5 focus:shadow-none">
-                              Top 11 Crypto Coin
+                          <div className={` ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80' : 'text-slate-700/80'}`}>
+                            <button popoverTarget="my-popover" 
+                              className="flex items-center justify-center bg-teal-500 font-bold tracking-wider text-neutral-100
+                                px-4 py-2 rounded-md shadow-md/30 hover:bg-teal-500/80 hover:shadow-none
+                                hover:translate-y-0.5 focus:translate-y-0.5 focus:shadow-none
+                                uppercase"
+                            >
+                              <div className="hidden md:inline-block text-sm lg:text-base">Top 11 Crypto Coin</div>
+                              <div className="inline-block md:hidden"><LayoutDashboard className="w-5 h-5 text-white items-center"/></div>
                             </button>
-                            <div id="my-popover" popover="auto" className="bg-transparent top-25 md:scale-75 lg:scale-100 md:-left-35 lg:left-1/6 touch-auto">
+                            <div id="my-popover" popover="auto" className="bg-transparent top-25 -left-75 scale-50 md:scale-75 lg:scale-100 md:-left-35 lg:left-1/6 touch-auto">
                                 <CryptoTable coins={coins} historyData={sparkLineData} trends={trends} />
                             </div>
                           </div>
@@ -482,7 +508,7 @@ const App: FC<CryptoDataProps> = () => {
                         <section aria-label="Crypto Data" className="bg-neutral-700/20 p-3.5 md:p-5 rounded-lg shadow-lg shadow-neutral-500/50">
                           <div className={` border-b-2 pb-5 mb-5 flex justify-between items-end ${themeConfig[currentIndex].label === 'Night' ? 'border-neutral-200/70' : ' border-neutral-600/70'}`}>
                             <div className="">
-                              <h3 className="flex items-center gap-1 text-xl md:text-3xl font-black text-white uppercase tracking-wide md:tracking-tighter">
+                              <h3 className="flex items-center gap-1 text-lg md:text-3xl font-black text-white uppercase tracking-tight md:tracking-tighter">
                                 <img 
                                   src={selectedCoin.image} 
                                   className="h-6 md:h-8 w-6 md:w-8 object-contain"
@@ -493,7 +519,7 @@ const App: FC<CryptoDataProps> = () => {
                               <p className="text-[12px] md:text-base font-black uppercase tracking-wide text-teal-400 ">{selectedCoin.id} // {selectedCoin.symbol.toUpperCase()}</p>
                             </div>
                             <div className="text-right">
-                              <div className="text-xl md:text-3xl font-black text-white">£{`${selectedCoin.current_price <= 3 ? selectedCoin.current_price : selectedCoin.current_price.toLocaleString()}`}</div>
+                              <div className="text-lg md:text-3xl font-black text-white">£{`${selectedCoin.current_price <= 3 ? selectedCoin.current_price : selectedCoin.current_price.toLocaleString()}`}</div>
                               <div className="text-[12px] md:text-base font-black text-teal-400 uppercase tracking-wide">Current Price</div>
                             </div>
                           </div>
@@ -608,7 +634,7 @@ const App: FC<CryptoDataProps> = () => {
               }
             </main>
             
-            <section className="relative inset-0 z-40 top-25 md:top-0 
+            <section className="relative inset-0 z-40
               transform transition-transform duration-300
               md:static col-span-full md:translate-x-0
             bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 shadow-xl 
@@ -619,7 +645,7 @@ const App: FC<CryptoDataProps> = () => {
                 ${themeConfig[currentIndex].label === 'Night' ? 'border-mist-200/20' : 'border-mist-900/20'}`}
               >
                 <div className="flex justify-center">
-                  <TrendingUp className="w-8 h-8 text-emerald-500 mr-2"/>
+                  <TrendingUp className="w-8 h-8 text-emerald-400 mr-2"/>
                   <h2 
                     id="Crypto-Menu-Title"
                     className={`text-base md:text-lg
