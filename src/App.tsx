@@ -257,6 +257,7 @@ const App: FC = () => {
               </button>
             ))}
           </section>
+
           <ToastContainer 
             theme="dark" 
             position="top-right"
@@ -499,7 +500,7 @@ const App: FC = () => {
                               <div className="inline-block md:hidden"><LayoutDashboard className="w-5 h-5 text-white items-center"/></div>
                             </button>
                             <div id="my-popover" popover="auto" className="bg-transparent top-25 -left-75 scale-50 md:scale-75 lg:scale-100 md:-left-35 lg:left-1/6 touch-auto">
-                                <CryptoTable coins={coins} historyData={sparkLineData} trends={trends} />
+                                <CryptoTable coins={coins} historyData={sparkLineData} trends={trends} limit={11}/>
                             </div>
                           </div>
 
@@ -531,8 +532,8 @@ const App: FC = () => {
                             <CryptoField label="Total Volume" value={`${(selectedCoin.total_volume / 1e9).toFixed(2)}B`} currentIndex={currentIndex} />
                             <CryptoField label="Market Cap" value={`£${(selectedCoin.market_cap / 1e9).toFixed(2)}B`} currentIndex={currentIndex} />
                             <CryptoField label="Market Rank" value={`${selectedCoin.market_cap_rank}`} currentIndex={currentIndex} />
-                            <CryptoField label="Circulating" value={`${(selectedCoin.circulating_supply / 1e6).toFixed(2)}M`} currentIndex={currentIndex} />
-                            <CryptoField label="Max Supply" value={selectedCoin.max_supply ? `${(selectedCoin.max_supply / 1e6).toFixed(3)}M` : `∞`} currentIndex={currentIndex} />
+                            <CryptoField label="Circulating" value={`${(selectedCoin.circulating_supply / 1e6).toFixed(2)}M ${selectedCoin.symbol.toUpperCase()}`} currentIndex={currentIndex} />
+                            <CryptoField label="Max Supply" value={selectedCoin.max_supply ? `${(selectedCoin.max_supply / 1e6).toFixed(3)}M ${selectedCoin.symbol.toUpperCase()}` : `∞`} currentIndex={currentIndex} />
                           </div>
                         </section>
                         
@@ -613,8 +614,8 @@ const App: FC = () => {
                           >
                             <CryptoField label="Market Cap Change 24h" value={`${((selectedCoin.market_cap_change_24h ?? 0) / 1e9).toFixed(4)}B`} currentIndex={currentIndex} />
                             <CryptoField label="Market Cap Change 24h %" value={`${(selectedCoin.market_cap_change_percentage_24h ?? 0).toFixed(2) ?? 0}%`} currentIndex={currentIndex} />
-                            <CryptoField label="Total Supply" value={`${(selectedCoin.total_supply / 1e6).toFixed(3) ?? 'N/A'}M`} currentIndex={currentIndex} />
-                            <CryptoField label="Max Supply" value={selectedCoin.max_supply ? `${(selectedCoin.max_supply / 1e6).toFixed(2)}M` : '∞'} currentIndex={currentIndex} />
+                            <CryptoField label="Total Supply" value={`${(selectedCoin.total_supply / 1e6).toFixed(3) ?? 'N/A'}M ${selectedCoin.symbol.toUpperCase()}`} currentIndex={currentIndex} />
+                            <CryptoField label="Max Supply" value={selectedCoin.max_supply ? `${(selectedCoin.max_supply / 1e6).toFixed(2)}M ${selectedCoin.symbol.toUpperCase()}` : '∞'} currentIndex={currentIndex} />
                             <CryptoField label="All Time High" value={`£${(selectedCoin.ath).toFixed(2)}`} currentIndex={currentIndex} />
                             <CryptoField label="All Time High % Change" value={`${selectedCoin.ath_change_percentage?.toFixed(2) ?? '0'}%`} currentIndex={currentIndex} />
                             <CryptoField label="All Time Low" value={`£${(selectedCoin.atl).toFixed(2)}`} currentIndex={currentIndex} />
@@ -652,7 +653,7 @@ const App: FC = () => {
                       ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 ' : 'text-slate-700/80'}
                     `}
                   >
-                    Top 11 Crypto Coins by rank
+                    Top Crypto Coins by rank
                   </h2>
 
                 </div>
@@ -660,7 +661,8 @@ const App: FC = () => {
               <CryptoTable 
                 coins={coins} 
                 historyData={sparkLineData}
-                trends={trends} 
+                trends={trends}
+                limit={15}
               />
             </section>
 

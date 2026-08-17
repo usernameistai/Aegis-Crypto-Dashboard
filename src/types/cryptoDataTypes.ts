@@ -83,4 +83,5 @@ export interface CryptoTableProps {
   coins: CryptoDataProps[];
   historyData: Record<string, CryptoDataPoint[]>;
   trends: CryptoTrendsProps[];
+  limit?: number;
 };
