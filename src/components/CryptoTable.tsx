@@ -48,7 +48,7 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ coins, historyData, trends, l
     
   return (
     <>
-      <div className="relative bg-white/80 rounded-lg shadow-xl shadow-[#808080]/70 mx-3 my-5 px-3 py-2">
+      <div className="relative bg-white/90 rounded-lg shadow-xl shadow-[#808080]/70 mx-3 my-5 px-3 py-2">
         <Table className='text-slate-700/80'>
           <TableCaption className='top-0'>
             Top {limit} Crypto Coins by rank

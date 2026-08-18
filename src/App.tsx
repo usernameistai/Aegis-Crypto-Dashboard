@@ -38,7 +38,7 @@ const App: FC = () => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     window.scrollTo({
       top: 0,
-      behavior: prefersReducedMotion? 'instant' : 'smooth',
+      behavior: prefersReducedMotion ? 'instant' : 'smooth',
     });
   }, []);
 
@@ -499,7 +499,7 @@ const App: FC = () => {
                               <div className="hidden md:inline-block text-sm lg:text-base">Top 11 Crypto Coin</div>
                               <div className="inline-block md:hidden"><LayoutDashboard className="w-5 h-5 text-white items-center"/></div>
                             </button>
-                            <div id="my-popover" popover="auto" className="bg-transparent top-25 -left-75 scale-50 md:scale-75 lg:scale-100 md:-left-35 lg:left-1/6 touch-auto">
+                            <div id="my-popover" popover="auto" className="bg-transparent top-25 -left-75 scale-50 md:scale-75 lg:scale-100 md:-left-27 lg:left-1/5 touch-auto">
                                 <CryptoTable coins={coins} historyData={sparkLineData} trends={trends} limit={11}/>
                             </div>
                           </div>
@@ -517,11 +517,11 @@ const App: FC = () => {
                                 /> 
                                 {selectedCoin.name}
                               </h3>
-                              <p className="text-[12px] md:text-base font-black uppercase tracking-wide text-teal-400 ">{selectedCoin.id} // {selectedCoin.symbol.toUpperCase()}</p>
+                              <p className="text-[12px] md:text-base font-black uppercase tracking-wide text-teal-300 ">{selectedCoin.id} // {selectedCoin.symbol.toUpperCase()}</p>
                             </div>
                             <div className="text-right">
                               <div className="text-lg md:text-3xl font-black text-white">£{`${selectedCoin.current_price <= 3 ? selectedCoin.current_price : selectedCoin.current_price.toLocaleString()}`}</div>
-                              <div className="text-[12px] md:text-base font-black text-teal-400 uppercase tracking-wide">Current Price</div>
+                              <div className="text-[12px] md:text-base font-black text-teal-300 uppercase tracking-wide">Current Price</div>
                             </div>
                           </div>
 

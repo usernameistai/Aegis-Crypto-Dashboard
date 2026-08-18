@@ -7,24 +7,24 @@ import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartToo
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select";
 import type { CryptoChartProps } from "@/types/cryptoDataTypes";
 
-const cryptoChartConfig = { price: { label: "Price", color: "#hsl(var(--chart-1))", }} satisfies ChartConfig;
+const cryptoChartConfig = { price: { label: "Price", color: "white", }} satisfies ChartConfig;
 
 const CryptoChart = ({ data, days, onDaysChange }: CryptoChartProps) => {
   const selectValue = `${days}d`;
 
   return (
     <>
-      <Card className="pt-0 shadow-xl shadow-[#808080]/70 bg-white/90 border-b-2 border-r-2 border-neutral-200/70">
-        <CardHeader className="flex items-center gap-2 space-y-0 border-b border-teal-700/70 py-5 sm:flex-row">
+      <Card className="pt-0 shadow-xl shadow-[#808080]/70 bg-slate-900/95 border-b-2 border-r-2 border-neutral-300/70">
+        <CardHeader className="flex items-center gap-2 space-y-0 py-5 sm:flex-row">
           
           <div className="grid flex-1 gap-1">
-            <CardTitle className="text-xs md:text-base text-slate-500 font-bold">Asset Performance</CardTitle>
-            <CardDescription className="text-[11px] md:text-sm">
+            <CardTitle className="text-xs md:text-base text-white font-bold tracking-wider">Crypto Performance</CardTitle>
+            <CardDescription className="text-[10px] md:text-sm text-white/80">
               Crypto values for the selected timeframe 
             </CardDescription>
           </div>
 
-          <div className="text-slate-700">
+          <div className="text-emerald-400 font-semibold bg-slate-800/90">
             <Select 
               value={selectValue} 
               onValueChange={(val) => {
@@ -34,19 +34,19 @@ const CryptoChart = ({ data, days, onDaysChange }: CryptoChartProps) => {
               }}
             >
               <SelectTrigger
-                className="hidden w-40 rounded-lg sm:ml-auto sm:flex"
+                className="hidden w-40 sm:ml-auto sm:flex bg-slate-800/90"
                 aria-label="Select a value"
               >
                 <SelectValue placeholder="Last 3 months" />
               </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                <SelectItem value="90d" className="text-slate-700 rounded-lg">
+              <SelectContent className="rounded-lg bg-slate-800/90">
+                <SelectItem value="90d" className="text-emerald-300 rounded-lg bg-slate-800/90">
                   Last 3 months
                 </SelectItem>
-                <SelectItem value="30d" className="text-slate-700 rounded-lg">
+                <SelectItem value="30d" className="text-emerald-300 rounded-lg bg-slate-800/90">
                   Last ~30d
                 </SelectItem>
-                <SelectItem value="7d" className="text-slate-700 rounded-lg">
+                <SelectItem value="7d" className="text-emerald-300 rounded-lg bg-slate-800/90">
                   Last 7d
                 </SelectItem>
               </SelectContent>
@@ -54,7 +54,7 @@ const CryptoChart = ({ data, days, onDaysChange }: CryptoChartProps) => {
           </div>
         </CardHeader>
 
-        <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
+        <CardContent className="">
           <div className="sr-only">
             <h3>Chart summary: Crypto values</h3>
             <p>
@@ -72,31 +72,31 @@ const CryptoChart = ({ data, days, onDaysChange }: CryptoChartProps) => {
               exit={{ opacity: 0, y: -10, filter: "blur(5px)" }}
               transition={{ duration: 0.4, ease: "easeInOut" }}
             >
-              <ChartContainer config={cryptoChartConfig} className="aspect-auto h-62.5 w-full" >
+              <ChartContainer config={cryptoChartConfig} className="h-85 w-full" >
                 <AreaChart data={data}>
                   <defs>
                     <linearGradient id="fillPrice" x1="0" y1="0" x2="0" y2="1">
                       <stop
                         offset="5%"
-                        stopColor="#0d9488"
+                        stopColor="#34D399"
                         stopOpacity={0.8}
                       />
                       <stop
                         offset="95%"
-                        stopColor="#0d9488"
-                        stopOpacity={0.1}
+                        stopColor="#34D399"
+                        stopOpacity={0}
                       />
                     </linearGradient>
                   </defs>
 
-                  <CartesianGrid vertical={false} />
+                  <CartesianGrid vertical={false} horizontal={false} />
                   <XAxis
                     dataKey="date"
                     tickLine={false}
                     axisLine={false}
                     tickMargin={8}
                     minTickGap={32}
-                    tick={{ fontSize: 10, fill: '#64748b' }}
+                    tick={{ fontSize: 10, fill: '#34D399' }}
                     tickFormatter={(value) => {
                       const date = new Date(value)
                       return date.toLocaleDateString("en-UK", {
@@ -107,14 +107,16 @@ const CryptoChart = ({ data, days, onDaysChange }: CryptoChartProps) => {
                   />
                   <YAxis 
                     domain={['auto', 'auto']}
-                    tick={{ fill: '#334155', fontSize: 10 }}
+                    scale="log"
+                    allowDataOverflow={true}
+                    tick={{ fill: '#34D399', fontSize: 10 }}
                     axisLine={false}                         
                     tickLine={false}                        
                     tickFormatter={(value) => `£${value.toLocaleString()}`}
-                    width={40}                               
+                    hide
                   />
                   <ChartTooltip
-                    cursor={false}
+                    cursor={true}
                     content={
                       <ChartTooltipContent
                         labelFormatter={(value) => {
@@ -136,14 +138,15 @@ const CryptoChart = ({ data, days, onDaysChange }: CryptoChartProps) => {
                   />
                   <Area
                     dataKey="price"
-                    type="natural"
+                    type="monotone"
                     fill="url(#fillPrice)"
-                    stroke="#0d9488"
-                    stackId="a"
+                    stroke="#34D399"
+                    strokeWidth={3}
+                    // stackId="a"
                   />
                   <ChartLegend
                     content={
-                      <ChartLegendContent className="text-[#808080] font-bold"/>
+                      <ChartLegendContent className="text-emerald-300 font-bold"/>
                     } 
                   />
                 </AreaChart>
