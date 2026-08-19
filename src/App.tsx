@@ -24,15 +24,32 @@ const App: FC = () => {
   const menuRef = useRef<HTMLInputElement>(null);
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const trendingUrl = useMemo(() => `https://api.coingecko.com/api/v3/search/trending`, []);
   const url1 = useMemo(() => `https://api.coingecko.com/api/v3/coins/markets?vs_currency=gbp&order=market_cap_desc&per_page=250&page=1&sparkline=true`, []);
   const url2 = useMemo(() => `https://api.coingecko.com/api/v3/coins/${params.id}/market_chart?vs_currency=${params.currency}&days=${params.days}`, [params.id, params.currency, params.days]);
-  const trendingUrl = useMemo(() => `https://api.coingecko.com/api/v3/search/trending`, []);
   
   useEffect(() => {
+    let loadedCount = 0; // added
     // Preload images into browser cache
     preload_images.forEach((src) => {
       const img = new Image();
       img.src = src;
+
+      img.onload = () => { // added
+      loadedCount++;
+      // Once all 6 images are fully cached, drop the loading flag
+      if (loadedCount === preload_images.length) {
+          setIsLoading(false);
+        }
+      };
+
+    // Edge case safeguard: handle image download errors gracefully
+    img.onerror = () => { // added
+      loadedCount++;
+      if (loadedCount === preload_images.length) {
+          setIsLoading(false);
+        }
+      };
     });
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -236,10 +253,17 @@ const App: FC = () => {
             </>
           )}
 
+          {themeConfig.map((_, idx) => (
+            <div
+              key={idx}
+              className={`theme-layer bg-layer-${idx} ${currentIndex === idx ? 'theme-active' : ''}`}
+            />
+          ))}
+
           <section aria-label="Theme selection"
             className={`flex backdrop-blur-md border border-white/10
             rounded-md p-1 shadow-[0_4px_30px_rgba(0,0,0,0.1)] justify-between
-            ${themeConfig[currentIndex].label === 'Default' ? 'bg-neutral-400/50' : 'bg-white/5'}`}
+            ${themeConfig[currentIndex].label === 'Default' ? 'bg-neutral-400/30' : 'bg-white/5'}`}
           >
             {themeConfig.map((theme, idx) => (
               <button
@@ -247,7 +271,7 @@ const App: FC = () => {
                 role="tab"
                 aria-pressed={currentIndex === idx ? true : false}
                 onClick={() => setCurrentIndex(idx)}
-                className={`px-2 py-1 text-[10px] md:text-[12px] lg:text-[14px] font-mono font-bold rounded-sm uppercase tracking-widest transition-all duration-300 hover:bg-white/10
+                className={`px-2 py-1 text-[10px] md:text-[12px] lg:text-[14px] font-semibold rounded-sm uppercase tracking-widest transition-all duration-300 hover:bg-white/10 hover:font-bold
                   ${currentIndex === idx 
                     ? 'bg-white/20 text-white shadow-[0_0_15px_rgba(255,255,255,0.2)]' 
                     : 'text-white/70 hover:text-white hover:bg-white/30'
@@ -295,15 +319,16 @@ const App: FC = () => {
               <div className="flex w-full items-center gap-1">
                 {trends.slice(0, 8).map((trend, index) => (
                   <button key={trend.id} 
-                    className={`flex flex-1 items-center justify-between border border-white/10 bg-[#808080]/20 px-2 py-1 
-                      rounded-lg shadow-md hover:border-cyan-400 gap-1 hover:bg-white/10 cursor-pointer
-                      focus:outline-none focus:ring-2 focus:ring-cyan-400
+                    className={`flex flex-1 items-center justify-between border-2 border-white/10 bg-[#808080]/20 px-2 py-1 
+                      rounded-lg shadow-md hover:shadow-lg hover:border-cyan-300 gap-1 cursor-pointer
+                      focus:outline-none
                       ${ index <= 1 
                           ? "flex"
                           : index <= 4 
                             ? "hidden md:flex"
                             : "hidden lg:flex"
                       }
+                      ${themeConfig[currentIndex].label === 'Night' ? 'hover:bg-white/20' : 'hover:bg-white/10'}
                     `}
                     onClick={() => handleCryptoTrend(trend)}
                   >

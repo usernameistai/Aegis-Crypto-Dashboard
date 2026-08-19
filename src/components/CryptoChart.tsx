@@ -96,7 +96,7 @@ const CryptoChart = ({ data, days, onDaysChange }: CryptoChartProps) => {
                     axisLine={false}
                     tickMargin={8}
                     minTickGap={32}
-                    tick={{ fontSize: 10, fill: '#34D399' }}
+                    tick={{ fontSize: 10, fill: 'white' }}
                     tickFormatter={(value) => {
                       const date = new Date(value)
                       return date.toLocaleDateString("en-UK", {

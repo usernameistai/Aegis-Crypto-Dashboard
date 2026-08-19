@@ -26,15 +26,15 @@ const CryptoField = (
         shadow-md p-4 rounded-md font-black tracking-wider 
         transition-all duration-300 ease-in-out
         brightness-125 contrast-150 saturate-150
-        hover:bg-neutral-400/5 hover:scale-110
-        focus:bg-neutral-400/5 focus:scale-110"
+        hover:bg-slate-900/20 hover:scale-110
+        focus:bg-slate-900/20 focus:scale-110 hover:text-slate-200/70 focus:text-slate-200/70"
     >
       <div className="absolute inset-x-0 top-0 h-px bg-white/20" />
 
       <div className="text-[11px] md:text-[12px] lg:text-sm text-slate-100/80 uppercase mb-1 tracking-widest">
         {label}
       </div>
-      <div className={`text-sm md:text-base font-semibold font-mono 
+      <div className={`text-sm md:text-base font-semibold font-mono
         ${theme.label === 'Night' ? 'text-slate-200/70' : 'text-slate-800/70'}`}
       >
         {value}

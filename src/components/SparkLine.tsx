@@ -16,7 +16,7 @@ const SparkLine = ({ data, sparklineUrl, className = "" }: SparkLineProps) => {
         <img 
           src={sparklineUrl} 
           alt=""
-          className="w-full h-full object-contain" 
+          className="w-full h-full object-contain"
         />
       </div>
     )
@@ -25,7 +25,7 @@ const SparkLine = ({ data, sparklineUrl, className = "" }: SparkLineProps) => {
   return (
     <>
       <div className={sparklineClass}>
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width={96} height={40}>
           <LineChart data={data} margin={{ top: 2, right: 0, bottom: 2, left: 0 }}>
             <XAxis dataKey="date" hide domain={['dataMin', 'dataMax']} />
             <YAxis hide domain={['dataMin', 'dataMax']} />

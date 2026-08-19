@@ -137,6 +137,34 @@
   background-attachment: fixed;
 }
 
+/* This a test   */
+
+/* Base configuration for all image slots */
+.theme-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+  will-change: opacity;
+}
+
+/* Explicit file mappings matching your array order */
+.bg-layer-0 { background-image: url('/background.webp'); }
+.bg-layer-1 { background-image: url('/backgroundNighttime.webp'); }
+.bg-layer-2 { background-image: url('/spring.webp'); }
+.bg-layer-3 { background-image: url('/summer.webp'); }
+.bg-layer-4 { background-image: url('/autumn.webp'); }
+.bg-layer-5 { background-image: url('/winter.webp'); }
+
+/* The single switch class that triggers the cross-fade */
+.theme-active {
+  opacity: 1;
+}
+
 /* --- LAYOUT UTILITIES --- */
 .data-shield { position: relative; }
 .data-shield::before {
