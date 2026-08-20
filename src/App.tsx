@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState, useRef, type FC } from "react";
 import axios from "axios";
-import type { CryptoDataProps, CryptoTrendsProps, CryptoDataHistory, PriceResponse, CryptoDataPoint, TrendingCoins } from "./types/cryptoDataTypes";
+import { type CryptoDataProps, type CryptoTrendsProps, type CryptoDataHistory, type PriceResponse, type CryptoDataPoint, type TrendingCoins, type CryptoDescriptionProps } from "./types/cryptoDataTypes";
 import CryptoChart from "./components/CryptoChart";
 import CryptoField from "./components/CryptoField";
 import CryptoTable from "./components/CryptoTable";
@@ -17,6 +17,7 @@ const App: FC = () => {
   const [priceData, setPriceData] = useState<PriceResponse | null>(null);
   const [params, setParams] = useState<CryptoDataHistory>({ id: `bitcoin`, currency: 'gbp', days: 90 });
   const [trends, setTrends] = useState<CryptoTrendsProps[]>([]);
+  const [description, setDescription] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [isOpen, setIsOpen] = useState(false);
@@ -24,27 +25,27 @@ const App: FC = () => {
   const menuRef = useRef<HTMLInputElement>(null);
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const trendingUrl = useMemo(() => `https://api.coingecko.com/api/v3/search/trending`, []);
-  const url1 = useMemo(() => `https://api.coingecko.com/api/v3/coins/markets?vs_currency=gbp&order=market_cap_desc&per_page=250&page=1&sparkline=true`, []);
-  const url2 = useMemo(() => `https://api.coingecko.com/api/v3/coins/${params.id}/market_chart?vs_currency=${params.currency}&days=${params.days}`, [params.id, params.currency, params.days]);
+  const BASE = 'https://api.coingecko.com/api/v3';
+  const trendingUrl = useMemo(() => `${BASE}/search/trending`, []);
+  const url1 = useMemo(() => `${BASE}/coins/markets?vs_currency=gbp&order=market_cap_desc&per_page=250&page=1&sparkline=true`, []);
+  const url2 = useMemo(() => `${BASE}/coins/${params.id}/market_chart?vs_currency=${params.currency}&days=${params.days}`, [params.id, params.currency, params.days]);
+  const descripionUrl = useMemo(() => `${BASE}/coins/${params.id}?tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=true`, [params.id]);
   
   useEffect(() => {
-    let loadedCount = 0; // added
-    // Preload images into browser cache
+    let loadedCount = 0;
+
     preload_images.forEach((src) => {
       const img = new Image();
       img.src = src;
 
-      img.onload = () => { // added
+      img.onload = () => {
       loadedCount++;
-      // Once all 6 images are fully cached, drop the loading flag
       if (loadedCount === preload_images.length) {
           setIsLoading(false);
         }
       };
 
-    // Edge case safeguard: handle image download errors gracefully
-    img.onerror = () => { // added
+    img.onerror = () => {
       loadedCount++;
       if (loadedCount === preload_images.length) {
           setIsLoading(false);
@@ -69,8 +70,10 @@ const App: FC = () => {
     const fetchTrends = async () => {
       setIsLoading(true);
       try {
-        const res = await axios.get<TrendingCoins>(trendingUrl, { signal: controller.signal });
-        // console.log(res.data.coins, "data");
+        const res = await axios.get<TrendingCoins>(trendingUrl, { 
+          headers: { 'x-cg-demo-api-key': import.meta.env.VITE_COINGECKO_API_KEY }, 
+          signal: controller.signal 
+        });
         setTrends(res.data.coins.map(coin => coin.item));
       } catch (err) {
         if (!axios.isCancel(err)) console.error("Coin trend list fetch error", err);
@@ -96,7 +99,10 @@ const App: FC = () => {
     const fetchCoins = async () => {
       setIsLoading(true);
       try {
-        const res = await axios.get<CryptoDataProps[]>(url1, { signal: controller.signal });
+        const res = await axios.get<CryptoDataProps[]>(url1, { 
+          headers: { 'x-cg-demo-api-key': import.meta.env.VITE_COINGECKO_API_KEY }, 
+          signal: controller.signal 
+        });
         setCoins(res.data);
       } catch (err) {
         if (!axios.isCancel(err)) console.error("Coin list fetch error", err);
@@ -116,7 +122,10 @@ const App: FC = () => {
       setPriceData(null);
       setIsLoading(true);
       try {
-        const res = await axios.get<PriceResponse>(url2, { signal: controller.signal });
+        const res = await axios.get<PriceResponse>(url2, { 
+          headers: { 'x-cg-demo-api-key': import.meta.env.VITE_COINGECKO_API_KEY }, 
+          signal: controller.signal 
+        });
         setPriceData(res.data);
       } catch (err) {
         if (!axios.isCancel(err)) console.error("Coin list fetch error", err);
@@ -127,6 +136,29 @@ const App: FC = () => {
     fetchCryptoChartData();
     return () => controller.abort();
   }, [url2]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchDescriptionData = async () => {
+      setIsLoading(true);
+      try {
+        const res = await axios.get<CryptoDescriptionProps>(descripionUrl, { 
+          headers: { 'x-cg-demo-api-key': import.meta.env.VITE_COINGECKO_API_KEY }, 
+          signal: controller.signal 
+        });
+        setDescription(res.data.description?.en);
+      } catch (err) {
+        if (!axios.isCancel(err)) console.error("Coin description fetch error", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchDescriptionData();
+
+    return () => controller.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.id]);
 
   const sparkLineData = useMemo(() => {
     const result: Record<string, CryptoDataPoint[]> = {};
@@ -199,6 +231,7 @@ const App: FC = () => {
       id: coin.id,
     }));
     setSearch(''); 
+    setDescription('');
 
     if (menuRef.current) menuRef.current.checked = false;
     
@@ -226,6 +259,14 @@ const App: FC = () => {
       setSearch('');
     }, 200);
   };
+
+  const getFirstWord = (htmlString: string) => {
+    if (!htmlString) return '';
+    const cleanText = htmlString.replace(/<[^>]*>/g, '');
+    
+    return cleanText.trim().split(' ')[0];
+  };
+
   
   return (
     <>
@@ -501,7 +542,7 @@ const App: FC = () => {
             >
               {priceData &&
                 <section aria-labelledby="Main-Data-Title"
-                  className="pb-4 uppercase text-left font-semibold"
+                  className="pb-4 text-left font-semibold"
                 >
                   {selectedCoin ? (
                     <>
@@ -509,7 +550,7 @@ const App: FC = () => {
                         <div className={`flex items-center justify-between text-base md:text-lg md:border-b md:mb-4 pb-2
                               ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 border-mist-200/20' : 'text-slate-700/80 border-mist-900/20'}`}>
                           <div id="Main-Data-Title"
-                            className="flex justify-center md:justify-start"
+                            className="flex justify-center md:justify-start uppercase"
                           >
                             <TrendingUpDown className="w-6 h-6 text-emerald-500 mr-2" strokeWidth={2.75} />
                             <h2><div className="hidden md:inline-block"> Aegis Crypto - </div> {selectedCoin.name} ({selectedCoin.symbol.toUpperCase()}) <div className="hidden md:inline-block">Databoard</div> </h2>
@@ -647,12 +688,13 @@ const App: FC = () => {
                             <CryptoField label="All Time Low % Change" value={`${selectedCoin.atl_change_percentage.toFixed(2) ?? '0'}%`} currentIndex={currentIndex} />
                           </div>
                         </section>
+
                         
                       </div>
                     </>
                   ) : (
                     <>
-                      <h3 className="flex justify-center pb-4 mb-4 text-base md:text-lg text-slate-700/80">Select a Cryptocurrency from sidebar to view data</h3>
+                      <h3 className="flex justify-center pb-4 mb-4 text-base md:text-lg text-slate-700/80 uppercase">Select a Cryptocurrency from sidebar to view data</h3>
                     </>
                   )}
                 </section>
@@ -692,6 +734,29 @@ const App: FC = () => {
             </section>
 
           </div>
+
+          <section className={`relative inset-0 z-40 transform transition-transform
+            duration-300 md:static col-span-full md:translate-x-0 bg-[#808080]/10
+            backdrop-blur-md border-[1.5px] border-white/20 shadow-xl shadow-[#808080]/70
+            shrink-0 p-2 md:p-4 m-4 rounded-lg overflow-y-auto touch-pan-y
+            ${themeConfig[currentIndex].label === 'Night' 
+              || themeConfig[currentIndex].label === 'Autumn' 
+              ? 'text-slate-200/80 ' : 'text-slate-900/80'}
+            `}
+          >
+            <details className="bg-neutral-700/20 p-3.5 md:p-5 m-4 rounded-lg shadow-lg shadow-neutral-500/50">
+              {description && (
+                <>
+                  <summary className="cursor-pointer">About {getFirstWord(description)}</summary>
+                  <div
+                    className="prose prose-invert py-4"
+                    dangerouslySetInnerHTML={{ __html: description }}
+                  />
+                
+                </>
+              )}
+            </details>
+          </section>
 
           <section aria-label="Theme selection"
             className={`flex backdrop-blur-md border border-white/10

@@ -49,6 +49,10 @@ export interface CryptoTrendsProps {
     total_volume: string;
     total_volume_btc: string;
     sparkline: string;
+    content?: {
+      title?: string;
+      description?: string;
+    }
   };
 };
 
@@ -84,4 +88,11 @@ export interface CryptoTableProps {
   historyData: Record<string, CryptoDataPoint[]>;
   trends: CryptoTrendsProps[];
   limit?: number;
+};
+
+export interface CryptoDescriptionProps {
+  id: string;
+  description: {
+    en: string;
+  }
 };
