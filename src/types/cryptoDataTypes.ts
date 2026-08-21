@@ -26,7 +26,7 @@ export interface CryptoDataProps {
   last_updated: string; // new
   sparkline_in_7d: {
     price: number[];
-  }
+  };
 };
 
 export interface CryptoTrendsProps {
@@ -69,7 +69,7 @@ export interface CryptoDataHistory {
 };
 
 export interface CryptoDataPoint {
-  date: string;
+  date?: string;
   price: number;
 };
 

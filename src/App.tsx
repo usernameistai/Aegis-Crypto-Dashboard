@@ -1,6 +1,14 @@
-import React, { useEffect, useMemo, useState, useRef, type FC } from "react";
+import { useEffect, useMemo, useState, useRef, type FC } from "react";
 import axios from "axios";
-import { type CryptoDataProps, type CryptoTrendsProps, type CryptoDataHistory, type PriceResponse, type CryptoDataPoint, type TrendingCoins, type CryptoDescriptionProps } from "./types/cryptoDataTypes";
+import type { 
+  CryptoDataProps, 
+  CryptoTrendsProps, 
+  CryptoDataHistory,
+  PriceResponse, 
+  CryptoDataPoint, 
+  TrendingCoins, 
+  CryptoDescriptionProps 
+} from "./types/cryptoDataTypes";
 import CryptoChart from "./components/CryptoChart";
 import CryptoField from "./components/CryptoField";
 import CryptoTable from "./components/CryptoTable";
@@ -9,6 +17,7 @@ import { LuSquareMenu } from "react-icons/lu";
 import { ChartCandlestick, Flame, LayoutDashboard, TrendingUp, TrendingUpDown } from "lucide-react";
 import TrendSparkLine from "./components/TrendSparkLine";
 import { Flip, ToastContainer, toast } from 'react-toastify';
+import CryptoSearch from "./components/CryptoSearch";
 
 const App: FC = () => {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
@@ -17,13 +26,12 @@ const App: FC = () => {
   const [priceData, setPriceData] = useState<PriceResponse | null>(null);
   const [params, setParams] = useState<CryptoDataHistory>({ id: `bitcoin`, currency: 'gbp', days: 90 });
   const [trends, setTrends] = useState<CryptoTrendsProps[]>([]);
-  const [description, setDescription] = useState<string | null>(null);
+  const [descriptionCache, setDescriptionCache] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(''); // removed search fro [search, setSearch]
   const [isOpen, setIsOpen] = useState(false);
   const [isDataExpanded, setIsDataExpanded] = useState(false);
   const menuRef = useRef<HTMLInputElement>(null);
-  const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const BASE = 'https://api.coingecko.com/api/v3';
   const trendingUrl = useMemo(() => `${BASE}/search/trending`, []);
@@ -137,45 +145,15 @@ const App: FC = () => {
     return () => controller.abort();
   }, [url2]);
 
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const fetchDescriptionData = async () => {
-      setIsLoading(true);
-      try {
-        const res = await axios.get<CryptoDescriptionProps>(descripionUrl, { 
-          headers: { 'x-cg-demo-api-key': import.meta.env.VITE_COINGECKO_API_KEY }, 
-          signal: controller.signal 
-        });
-        setDescription(res.data.description?.en);
-      } catch (err) {
-        if (!axios.isCancel(err)) console.error("Coin description fetch error", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchDescriptionData();
-
-    return () => controller.abort();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.id]);
-
-  const sparkLineData = useMemo(() => {
+  const createSparkLineData = ( coins: CryptoDataProps[] ): Record<string, CryptoDataPoint[]> => {
     const result: Record<string, CryptoDataPoint[]> = {};
 
     coins.forEach((coin) => {
-      // if (!coin.sparkline_in_7d?.price) return;
-
-      // result[coin.id] = coin.sparkline_in_7d.price.map((p: number, i: number) => ({
-      //   date: new Date(Date.now() - (coin.sparkline_in_7d!.price.length - 7 - i) * 24 * 3600 * 1000).toISOString(),
-      //   price: p,
-      // }));
-
       const prices = coin.sparkline_in_7d?.price;
 
-      if (!prices) return;
+      if (!prices?.length) return;
 
-      const interval = (7 * 24 * 60 * 60 * 1000) / prices.length;
+      const interval = (7 * 24 * 3600 * 1000) / (prices.length - 1);
 
       result[coin.id] = prices.map((price, i) => ({
         date: new Date(
@@ -184,27 +162,23 @@ const App: FC = () => {
         price,
       }));
     });
-    // added coins.sparkline_in_7d!.price.length -
 
     return result;
-  }, [coins]);
+  };
+
+  const sparkLineData = useMemo(
+    () => createSparkLineData(coins),
+    [coins]
+  );
 
   const formattedData = useMemo(() => {
     if (!priceData?.prices) return [];
-    // return priceData 
-    //   ?
+  
     return priceData.prices.map(([timestamp, price]) => ({ // : [number, number]
         date: new Date(timestamp).toISOString(),
         price: price,
       }));
-      // : [];
   }, [priceData]);
-
-  const filteredCoins = useMemo(() => {
-    if (!search) return [];
-
-    return coins.filter((c) => c.name.toLowerCase().includes(search.toLowerCase()));
-  }, [search, coins]);
 
   const handleCryptoTrend = (trend: CryptoTrendsProps ) => {    
     const coin = coins.find((coin) => coin.id === trend.id);
@@ -230,8 +204,7 @@ const App: FC = () => {
       ...prev,
       id: coin.id,
     }));
-    setSearch(''); 
-    setDescription('');
+    setSearch('');
 
     if (menuRef.current) menuRef.current.checked = false;
     
@@ -241,23 +214,25 @@ const App: FC = () => {
     });
   };
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    setSearch(newValue);
-  };
+  const fetchDescriptionData = async () => {
+    const controller = new AbortController();
+    setIsLoading(true);
+    try {
+      const res = await axios.get<CryptoDescriptionProps>(descripionUrl, { 
+        headers: { 'x-cg-demo-api-key': import.meta.env.VITE_COINGECKO_API_KEY }, 
+        signal: controller.signal 
+      });
 
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    if (e.relatedTarget && e.currentTarget.form?.contains(e.relatedTarget)) {
-      return;
+      setDescriptionCache((prev) => ({
+        ...prev,
+        [params.id]: res.data.description?.en ?? ''
+      }));
+    } catch (err) {
+      if (!axios.isCancel(err)) console.error("Coin description fetch error", err);
+    } finally {
+      setIsLoading(false);
     }
-
-    if (blurTimeoutRef.current) {
-      clearTimeout(blurTimeoutRef.current);
-    };
-    
-    blurTimeoutRef.current = setTimeout(() => {
-      setSearch('');
-    }, 200);
+    return () => controller.abort();
   };
 
   const getFirstWord = (htmlString: string) => {
@@ -276,7 +251,7 @@ const App: FC = () => {
             <>
               <div role="status" aria-live="polite" aria-label="Loading Crypto Data"
                 className="fixed inset-0 w-screen h-screen bg-neutral-900/80 
-                flex flex-col items-center justify-center z-200 backdrop-blur-sm text-white">
+                flex flex-col items-center justify-center z-200 text-white">
                 <p className="animate-pulse font-mono tracking-[0.3em] uppercase mb-4">
                   Syncing Crypto Data...
                 </p>
@@ -291,6 +266,13 @@ const App: FC = () => {
 
               </div> 
             </>
+          )}
+
+          {search && (
+            <div className="sr-only">
+              Where do Generals keep their armies?
+              In their sleevies!!
+            </div>
           )}
 
           {themeConfig.map((_, idx) => (
@@ -343,7 +325,8 @@ const App: FC = () => {
           </h1>
 
           {/* Trending Crypto Coins */}
-          <section className={`flex bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 shadow-xl 
+          <section aria-label="Trending Crypto List Horizontal"
+            className={`flex bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 shadow-xl 
             shadow-[#808080]/60 p-2 md:p-4 m-4 rounded-lg
             ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 ' : 'text-slate-700/80'}`}
           >
@@ -425,7 +408,8 @@ const App: FC = () => {
               aria-labelledby="Crypto-Menu-Title"
             >
 
-              <div className={`relative pb-4 mb-2 border-b uppercase text-left font-semibold
+              <div aria-label="Crypto list select title"
+                className={`relative pb-4 mb-2 border-b uppercase text-left font-semibold
                 ${themeConfig[currentIndex].label === 'Night' ? 'border-mist-200/20' : 'border-mist-900/20'}`}
               >
                 <div className="flex items-center">
@@ -441,69 +425,7 @@ const App: FC = () => {
                 </div>
               </div>
 
-              <form
-                className="relative"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  if (filteredCoins.length > 0) handleSelectCoin(filteredCoins[0]);
-                  if (menuRef.current) menuRef.current.checked = false;
-                  setSearch('');
-                }}
-              >
-                <label htmlFor="search" className="sr-only">Search for a Cryptocurrency</label>
-                <input 
-                  type="search"
-                  value={search}
-                  name="search" 
-                  id="search"
-                  autoComplete="off"
-                  aria-autocomplete="list"
-                  aria-expanded={search.length > 0 && filteredCoins.length > 0}
-                  aria-controls="Crypto-Coin-List"
-                  placeholder="Enter Crypto Coin"
-                  className="w-[95%] md:w-full bg-neutral-100 px-4 py-2 m-2 md:m-0 md:my-2 text-base
-                    border border-neutral-300/50 focus:outline-none focus:ring-2
-                  focus:ring-cyan-500 rounded-sm inset-shadow-xl inset-shadow-black"
-                  onChange={handleSearchChange}
-                  onBlur={handleBlur}
-                />
-                <button
-                  type="submit"
-                  className="w-[95%] md:w-full px-4 py-2 mx-2 md:mx-0 mb-4 text-neutral-100 text-base md:text-[17.5px] 
-                    uppercase font-semibold bg-teal-500 hover:bg-teal-500/80 rounded-sm 
-                    tracking-wider shadow-md/30 hover:shadow-none hover:translate-y-0.5 
-                    focus:translate-y-0.5 focus:shadow-none"
-                  onClick={() => {
-                    if (menuRef.current) menuRef.current.checked = false;
-                  }}
-                >
-                  Search
-                </button>
-                
-                {search && filteredCoins.length > 0 && (
-                  <div 
-                    id="Crypto-Coin-List"
-                    role="listbox"
-                    className="absolute z-100 w-[88%] bg-cyan-800 text-white border
-                    border-neutral-600 -mt-2.5 max-h-60 rounded-sm shadow-xl overflow-y-auto"
-                    aria-live="polite"
-                  >
-                    {filteredCoins.map((coin) => (
-                      <button
-                        type="button"
-                        key={coin.id}
-                        role="option"
-                        className="px-4 py-2 mb-4 cursor-pointer hover:bg-cyan-900 transition-colors"
-                        onClick={() => {
-                          handleSelectCoin(coin);
-                        }}
-                      >
-                        {coin.name}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </form>
+              <CryptoSearch coins={coins} handleSelectCoin={handleSelectCoin}/>
               
              {coins && 
                 <nav aria-label="Crypto Coin Selection">
@@ -734,14 +656,15 @@ const App: FC = () => {
                 coins={coins} 
                 historyData={sparkLineData}
                 trends={trends}
-                limit={15}
+                limit={10}
                 className="text-sm"
               />
             </section>
 
           </div>
 
-          <section className={`relative inset-0 z-40 transform transition-transform
+          <section aria-label="Detailed description of the selected crypto coin"
+            className={`relative inset-0 z-40 transform transition-transform
             duration-300 md:static col-span-full md:translate-x-0 bg-[#808080]/10
             backdrop-blur-md border-[1.5px] border-white/20 shadow-xl shadow-[#808080]/70
             shrink-0 p-2 md:p-4 m-4 rounded-lg overflow-y-auto touch-pan-y
@@ -750,13 +673,20 @@ const App: FC = () => {
               ? 'text-slate-200/80 ' : 'text-slate-900/80'}
             `}
           >
-            <details className="bg-neutral-700/20 p-3.5 md:p-5 m-4 rounded-lg shadow-lg shadow-neutral-500/50">
-              {description && (
+            <details 
+              className="bg-neutral-700/20 p-3.5 md:p-5 m-4 rounded-lg shadow-lg shadow-neutral-500/50 cursor-pointer"
+              onToggle={(e) => {
+                if (e.currentTarget.open && !descriptionCache[params.id]) fetchDescriptionData();
+              }}
+            >
+              {descriptionCache[params.id] && (
                 <>
-                  <summary className="cursor-pointer">About {getFirstWord(description)}</summary>
+                  <summary className="cursor-pointer">
+                    About {getFirstWord(descriptionCache[params.id])}
+                  </summary>
                   <div
                     className="prose prose-invert py-4"
-                    dangerouslySetInnerHTML={{ __html: description }}
+                    dangerouslySetInnerHTML={{ __html: descriptionCache[params.id] }}
                   />
                 
                 </>
