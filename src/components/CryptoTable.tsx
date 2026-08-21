@@ -28,7 +28,7 @@ const CryptoRow = ({ coin, history, trend }: { coin: CryptoDataProps, history: C
       <TableCell className={`${right} ${(coin.price_change_percentage_24h ?? 0) >= 0 ? 'text-emerald-400' : 'text-red-600'}`}>{(coin.price_change_percentage_24h ?? 0) >= 0 ? '▲' : '▼'} {coin.price_change_percentage_24h ?? 0}%</TableCell>
       <TableCell className={`${right} ${hiddenTable}`}>£{coin.high_24h}</TableCell>
       <TableCell className={`${right} ${hiddenTable}`}>£{coin.low_24h}</TableCell>
-      <TableCell className={`right ${(coin.price_change_24h ?? 0) >= 0 ? 'text-emerald-400' : 'text-red-600'}`}>
+      <TableCell className={`${right} ${(coin.price_change_24h ?? 0) >= 0 ? 'text-emerald-400' : 'text-red-600'}`}>
         { coin.price_change_24h === null
           ? "£ N/A"
           : `${coin.price_change_24h >= 0 ? "▲" : "▼"} £${coin.price_change_24h.toFixed(4)}`
