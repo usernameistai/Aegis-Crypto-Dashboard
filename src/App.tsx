@@ -267,7 +267,6 @@ const App: FC = () => {
     return cleanText.trim().split(' ')[0];
   };
 
-  
   return (
     <>
       <div className="data-shield" aria-hidden={isLoading ? "true" : "false"}>
@@ -565,8 +564,14 @@ const App: FC = () => {
                               <div className="hidden md:inline-block text-sm lg:text-base">Top 11 Crypto Coin</div>
                               <div className="inline-block md:hidden"><LayoutDashboard className="w-5 h-5 text-white items-center"/></div>
                             </button>
-                            <div id="my-popover" popover="auto" className="bg-transparent top-25 -left-75 scale-50 md:scale-75 lg:scale-100 md:-left-27 lg:left-1/5 touch-auto">
-                                <CryptoTable coins={coins} historyData={sparkLineData} trends={trends} limit={11}/>
+                            <div id="my-popover" popover="auto" className="bg-transparent top-25 lg:top-10 -left-76 md:-left-55 lg:left-36 scale-40 md:scale-70 lg:scale-85 touch-auto">
+                                <CryptoTable 
+                                  coins={coins} 
+                                  historyData={sparkLineData} 
+                                  trends={trends} 
+                                  limit={11}
+                                  className="text-xl "
+                                />
                             </div>
                           </div>
 
@@ -730,6 +735,7 @@ const App: FC = () => {
                 historyData={sparkLineData}
                 trends={trends}
                 limit={15}
+                className="text-sm"
               />
             </section>
 

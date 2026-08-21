@@ -88,10 +88,10 @@ export interface CryptoTableProps {
   historyData: Record<string, CryptoDataPoint[]>;
   trends: CryptoTrendsProps[];
   limit?: number;
+  className?: string;
 };
 
 export interface CryptoDescriptionProps {
-  id: string;
   description: {
     en: string;
   }
