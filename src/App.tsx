@@ -53,9 +53,9 @@ const App: FC = () => {
         }
       };
 
-    img.onerror = () => {
-      loadedCount++;
-      if (loadedCount === preload_images.length) {
+      img.onerror = () => {
+        loadedCount++;
+        if (loadedCount === preload_images.length) {
           setIsLoading(false);
         }
       };
@@ -127,7 +127,7 @@ const App: FC = () => {
     const controller = new AbortController();
 
     const fetchCryptoChartData = async () => {
-      setPriceData(null);
+      // setPriceData(null);
       setIsLoading(true);
       try {
         const res = await axios.get<PriceResponse>(url2, { 
@@ -283,8 +283,8 @@ const App: FC = () => {
           ))}
 
           <section aria-label="Theme selection"
-            className={`flex backdrop-blur-md border border-white/10
-            rounded-md p-1 shadow-[0_4px_30px_rgba(0,0,0,0.1)] justify-between
+            className={`flex backdrop-blur-lg border border-white/10
+            rounded-b-md p-1 shadow-[0_4px_30px_rgba(0,0,0,0.1)] justify-between
             ${themeConfig[currentIndex].label === 'Default' ? 'bg-neutral-400/30' : 'bg-white/5'}`}
           >
             {themeConfig.map((theme, idx) => (
@@ -293,7 +293,7 @@ const App: FC = () => {
                 role="tab"
                 aria-pressed={currentIndex === idx ? true : false}
                 onClick={() => setCurrentIndex(idx)}
-                className={`px-2 py-1 text-[10px] md:text-[12px] lg:text-[14px] font-semibold rounded-sm uppercase tracking-widest transition-all duration-300 hover:bg-white/10 hover:font-bold
+                className={`px-2 py-1 text-[9px] md:text-[10px] lg:text-[13px] font-semibold rounded-sm uppercase tracking-widest transition-all duration-300 hover:bg-white/10 hover:font-bold
                   ${currentIndex === idx 
                     ? 'bg-white/20 text-white shadow-[0_0_15px_rgba(255,255,255,0.2)]' 
                     : 'text-white/70 hover:text-white hover:bg-white/30'
@@ -326,7 +326,7 @@ const App: FC = () => {
 
           {/* Trending Crypto Coins */}
           <section aria-label="Trending Crypto List Horizontal"
-            className={`flex bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 shadow-xl 
+            className={`flex bg-[#808080]/10 backdrop-blur-lg border-[1.5px] border-white/20 shadow-xl 
             shadow-[#808080]/60 p-2 md:p-4 m-4 rounded-lg
             ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 ' : 'text-slate-700/80'}`}
           >
@@ -342,31 +342,31 @@ const App: FC = () => {
               <div className="flex w-full items-center gap-1">
                 {trends.slice(0, 8).map((trend, index) => (
                   <button key={trend.id} 
-                    className={`flex flex-1 items-center justify-between border-2 border-white/10 bg-[#808080]/20 px-2 py-1 
-                      rounded-lg shadow-md hover:shadow-lg hover:border-cyan-300 gap-1 cursor-pointer
-                      focus:outline-none
+                    className={`flex flex-1 items-center justify-between border-2 border-white/10 bg-[#808080]/10 px-2 py-1 
+                      rounded-lg shadow-md hover:shadow-lg hover:border-cyan-300 gap-1 cursor-pointer min-h-10 md:min-h-15 lg:min-h-17
+                      focus:outline-none hover:scale-105
                       ${ index <= 1 
                           ? "flex"
                           : index <= 4 
                             ? "hidden md:flex"
                             : "hidden lg:flex"
                       }
-                      ${themeConfig[currentIndex].label === 'Night' ? 'hover:bg-white/20' : 'hover:bg-white/10'}
+                      ${themeConfig[currentIndex].label === 'Night' ? 'hover:bg-white/20' : 'hover:bg-white/50'}
                     `}
                     onClick={() => handleCryptoTrend(trend)}
                   >
                     <img 
                       src={trend.small} 
                       alt={trend.name} 
-                      className="w-5 h-5 md:w-8 md:h-8 my-auto"
+                      className="w-5 h-5 md:w-8 md:h-8 lg:w-10 lg:h-10 my-auto"
                     />
                     <div className="flex flex-col items-center leading-tight">
                       <span className="text-[11px] md:text-xs lg:text-sm hidden md:flex">{trend.name}</span>
-                      <span className="text-[9px] md:text-[11px] lg:text-xs">{trend.symbol}</span>
+                      <span className="text-xs md:text-[11px] lg:text-xs">{trend.symbol}</span>
                     </div>
                     <TrendSparkLine 
                       src={trend.data.sparkline} 
-                      className="w-15 h-10 pl-2"
+                      className="pl-2"
                     />
                   </button>
                 ))}
@@ -400,8 +400,8 @@ const App: FC = () => {
             <aside 
               className="min-h-dvh fixed md:static z-100 top-25 right-0 bottom-0 left-0 md:top-0 transform 
                 transition-transform duration-300 translate-x-full peer-checked:translate-x-0 
-                 md:col-span-3 lg:col-span-2 md:translate-x-0 peer-checked:left-0
-              bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 shadow-xl 
+                md:col-span-3 lg:col-span-2 md:translate-x-0 peer-checked:left-0
+              bg-[#808080]/10 backdrop-blur-lg border-[1.5px] border-white/20 shadow-xl 
                 shadow-[#808080]/70 p-2 md:p-4 m-4 rounded-lg
                 overflow-y-auto touch-pan-y overscroll-contain"
               id="Crypto-Sidebar"
@@ -409,11 +409,11 @@ const App: FC = () => {
             >
 
               <div aria-label="Crypto list select title"
-                className={`relative pb-4 mb-2 border-b uppercase text-left font-semibold
-                ${themeConfig[currentIndex].label === 'Night' ? 'border-mist-200/20' : 'border-mist-900/20'}`}
+                className={`relative pb-4 mb-2 border-b uppercase text-left font-semibold flex items-center
+                  ${themeConfig[currentIndex].label === 'Night' ? 'border-mist-200/20' : 'border-mist-900/20'}`}
               >
                 <div className="flex items-center">
-                  <ChartCandlestick className="mr-1 text-teal-500"/>
+                  <ChartCandlestick className="w-6 h-6 mr-1 text-teal-500"/>
                   <h2 
                     id="Crypto-Menu-Title"
                     className={`text-base md:text-lg
@@ -457,21 +457,23 @@ const App: FC = () => {
 
             {/* Main Data Dashboard */}
             <main className="relative min-h-dvh col-span-12 md:col-span-9 lg:col-span-10
-              bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 
-              shadow-xl shadow-[#808080]/70 shrink-0 p-4 m-4 rounded-lg
+              bg-[#808080]/10 backdrop-blur-lg border-[1.5px] border-white/20 
+              shadow-xl shadow-[#808080]/70 shrink-0 p-2 md:p-4 m-4 rounded-lg
               touch-pan-y overscroll-contain"
             >
               {priceData &&
                 <section aria-labelledby="Main-Data-Title"
-                  className="pb-4 text-left font-semibold"
+                  className="pb-4 mb-2 text-left font-semibold"
                 >
                   {selectedCoin ? (
                     <>
                       <div className="relative">
-                        <div className={`flex items-center justify-between text-base md:text-lg md:border-b md:mb-4 pb-2
-                              ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 border-mist-200/20' : 'text-slate-700/80 border-mist-900/20'}`}>
+
+                        <div className={`flex items-center justify-between text-base md:text-lg md:border-b -mt-1 md:mb-4 pb-3
+                          ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 border-mist-200/20' : 'text-slate-700/80 border-mist-900/20'}`}
+                        >
                           <div id="Main-Data-Title"
-                            className="flex justify-center md:justify-start uppercase"
+                            className="flex items-center justify-center md:justify-start uppercase"
                           >
                             <TrendingUpDown className="w-6 h-6 text-emerald-500 mr-2" strokeWidth={2.75} />
                             <h2><div className="hidden md:inline-block"> Aegis Crypto - </div> {selectedCoin.name} ({selectedCoin.symbol.toUpperCase()}) <div className="hidden md:inline-block">Databoard</div> </h2>
@@ -487,13 +489,13 @@ const App: FC = () => {
                               <div className="inline-block md:hidden"><LayoutDashboard className="w-5 h-5 text-white items-center"/></div>
                             </button>
                             <div id="my-popover" popover="auto" className="bg-transparent top-25 lg:top-10 -left-76 md:-left-55 lg:left-36 scale-40 md:scale-70 lg:scale-85 touch-auto">
-                                <CryptoTable 
-                                  coins={coins} 
-                                  historyData={sparkLineData} 
-                                  trends={trends} 
-                                  limit={11}
-                                  className="text-xl "
-                                />
+                              <CryptoTable 
+                                coins={coins} 
+                                historyData={sparkLineData} 
+                                trends={trends} 
+                                limit={11}
+                                className="text-xl "
+                              />
                             </div>
                           </div>
 
@@ -632,7 +634,7 @@ const App: FC = () => {
             <section className="relative inset-0 z-40
               transform transition-transform duration-300
               md:static col-span-full md:translate-x-0
-            bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 shadow-xl 
+            bg-[#808080]/10 backdrop-blur-lg border-[1.5px] border-white/20 shadow-xl 
               shadow-[#808080]/70 shrink-0 p-2 md:p-4 m-4 rounded-lg
               overflow-y-auto touch-pan-y"
             >
@@ -666,7 +668,7 @@ const App: FC = () => {
           <section aria-label="Detailed description of the selected crypto coin"
             className={`relative inset-0 z-40 transform transition-transform
             duration-300 md:static col-span-full md:translate-x-0 bg-[#808080]/10
-            backdrop-blur-md border-[1.5px] border-white/20 shadow-xl shadow-[#808080]/70
+            backdrop-blur-lg border-[1.5px] border-white/20 shadow-xl shadow-[#808080]/70
             shrink-0 p-2 md:p-4 m-4 rounded-lg overflow-y-auto touch-pan-y
             ${themeConfig[currentIndex].label === 'Night' 
               || themeConfig[currentIndex].label === 'Autumn' 
@@ -695,8 +697,8 @@ const App: FC = () => {
           </section>
 
           <section aria-label="Theme selection"
-            className={`flex backdrop-blur-md border border-white/10
-            rounded-md p-1 shadow-[0_4px_30px_rgba(0,0,0,0.1)] justify-between
+            className={`flex backdrop-blur-lg border border-white/10
+            rounded-t-md p-1 shadow-[0_4px_30px_rgba(0,0,0,0.1)] justify-between
             ${themeConfig[currentIndex].label === 'Default' ? 'bg-neutral-400/50' : 'bg-white/5'}`}
           >
             {themeConfig.map((theme, idx) => (
@@ -705,7 +707,7 @@ const App: FC = () => {
                 role="tab"
                 aria-pressed={currentIndex === idx ? true : false}
                 onClick={() => setCurrentIndex(idx)}
-                className={`px-2 py-1 text-[10px] md:text-[12px] lg:text-[14px] font-mono font-bold rounded-sm uppercase tracking-widest transition-all duration-300 hover:bg-white/10
+                className={`px-2 py-1 text-[9px] md:text-[10px] lg:text-[13px] font-mono font-bold rounded-sm uppercase tracking-widest transition-all duration-300 hover:bg-white/10
                   ${currentIndex === idx 
                     ? 'bg-white/20 text-white shadow-[0_0_15px_rgba(255,255,255,0.2)]' 
                     : 'text-white/70 hover:text-white hover:bg-white/30'

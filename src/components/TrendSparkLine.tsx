@@ -10,7 +10,7 @@ const TrendSparkLine = ({ src, className }: TrendSparkLineProps) => {
         <img 
           src={src} 
           alt=""
-          className={className}
+          className={`w-full h-full object-contain ${className}`}
         />
       </div>
     </>

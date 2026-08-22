@@ -24,7 +24,7 @@ const CryptoChart = ({ data, days, onDaysChange }: CryptoChartProps) => {
             </CardDescription>
           </div>
 
-          <div className="text-emerald-400 font-semibold bg-slate-800/90">
+          <div className="text-emerald-400 font-semibold bg-slate-800/90 rounded-lg">
             <Select 
               value={selectValue} 
               onValueChange={(val) => {
@@ -34,19 +34,19 @@ const CryptoChart = ({ data, days, onDaysChange }: CryptoChartProps) => {
               }}
             >
               <SelectTrigger
-                className="hidden w-40 sm:ml-auto sm:flex bg-slate-800/90"
+                className="hidden w-40 sm:ml-auto sm:flex bg-slate-800/90 border border-slate-800/90"
                 aria-label="Select a value"
               >
                 <SelectValue placeholder="Last 3 months" />
               </SelectTrigger>
               <SelectContent className="rounded-lg bg-slate-800/90">
-                <SelectItem value="90d" className="text-emerald-300 rounded-lg bg-slate-800/90">
+                <SelectItem value="90d" className="text-emerald-300 mx-auto rounded-lg bg-slate-800/90">
                   Last 3 months
                 </SelectItem>
-                <SelectItem value="30d" className="text-emerald-300 rounded-lg bg-slate-800/90">
+                <SelectItem value="30d" className="text-emerald-300 mx-auto rounded-lg bg-slate-800/90">
                   Last ~30d
                 </SelectItem>
-                <SelectItem value="7d" className="text-emerald-300 rounded-lg bg-slate-800/90">
+                <SelectItem value="7d" className="text-emerald-300 mx-auto rounded-lg bg-slate-800/90">
                   Last 7d
                 </SelectItem>
               </SelectContent>
