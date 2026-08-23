@@ -357,10 +357,10 @@ const App: FC = () => {
             ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 ' : 'text-slate-700/80'}`}
           >
             <div className="flex w-full flex-col items-center">
-              <div className={`flex justify-between w-full items-center border-b -mt-1.5 mb-2 pb-2
+              <div className={`flex justify-between w-full items-center border-b md:-mt-1.5 mb-2 pb-2
                 ${themeConfig[currentIndex].label === 'Night' ? 'border-mist-200/20' : 'border-mist-900/20'}
               `}>
-                <div className="flex w-full items-center">
+                <div className="flex min-w-0 flex-1 items-center">
                   <Flame className="h-5 w-5 text-orange-500 mr-1" strokeWidth={3}/>
                   <h2 className="text-base md:text-lg uppercase font-semibold">
                     Trending Aegis Crypto
@@ -368,13 +368,13 @@ const App: FC = () => {
                 </div>
                 <div className={`flex shrink-0 ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80' : 'text-slate-700/80'}`}>
                   <button popoverTarget="favourite-popover" 
-                    className="flex shrink-0 items-center justify-center bg-teal-500 font-bold tracking-wider text-neutral-100
+                    className="flex shrink-0 items-center justify-center bg-teal-500 font-bold tracking-wider text-neutral-100 leading-5
                       px-3 py-1.5 md:px-4 md:py-2 rounded-md shadow-md/30 hover:bg-teal-500/80 hover:shadow-none
                       hover:translate-y-0.5 focus:translate-y-0.5 focus:shadow-none
                       uppercase"
                   >
                     <div className="hidden md:inline-flex text-sm lg:text-base">Favourite Crypto</div>
-                    <div className="inline-block md:hidden"><BookHeart className="w-5 h-5 text-white items-center"/></div>
+                    <div className="inline-block md:hidden"><BookHeart className="w-5 h-5 text-white"/></div>
                   </button>
                   <div id="favourite-popover" popover="auto" className="bg-transparent top-25 lg:top-20 -left-52 md:-left-44 lg:left-36 scale-55 md:scale-70 lg:scale-85 touch-auto">
                     <CryptoTable 
@@ -520,7 +520,7 @@ const App: FC = () => {
                         <div className={`flex items-center justify-between text-base md:text-lg md:border-b -mt-1 md:mb-4 pb-3
                           ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 border-mist-200/20' : 'text-slate-700/80 border-mist-900/20'}`}
                         >
-                          <div id="Main-Data-Title"
+                          <div id="Main-Data-Title" aria-label="Main-Data-Title"
                             className="flex items-center justify-center md:justify-start uppercase"
                           >
                             <TrendingUpDown className="w-6 h-6 text-emerald-500 mr-2" strokeWidth={2.75} />
