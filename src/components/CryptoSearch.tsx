@@ -10,7 +10,7 @@ const CryptoSearch:FC<CryptoSearchProps> = ({ coins, handleSelectCoin }) => {
   const [search, setSearch] = useState('');
   const menuRef = useRef<HTMLInputElement>(null);
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
+  
   const filteredCoins = useMemo(() => {
     if (!search) return [];
 

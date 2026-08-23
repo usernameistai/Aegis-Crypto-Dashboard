@@ -86,7 +86,7 @@ export interface PriceResponse {
 export interface CryptoTableProps {
   coins: CryptoDataProps[];
   historyData: Record<string, CryptoDataPoint[]>;
-  trends: CryptoTrendsProps[];
+  trends?: CryptoTrendsProps[];
   limit?: number;
   className?: string;
 };

@@ -14,7 +14,7 @@ import CryptoField from "./components/CryptoField";
 import CryptoTable from "./components/CryptoTable";
 import { themeConfig, preload_images } from "./config/themeConfig";
 import { LuSquareMenu } from "react-icons/lu";
-import { ChartCandlestick, Flame, LayoutDashboard, TrendingUp, TrendingUpDown } from "lucide-react";
+import { BookHeart, ChartCandlestick, Flame, LayoutDashboard, Star, TrendingUp, TrendingUpDown } from "lucide-react";
 import TrendSparkLine from "./components/TrendSparkLine";
 import { Flip, ToastContainer, toast } from 'react-toastify';
 import CryptoSearch from "./components/CryptoSearch";
@@ -31,6 +31,9 @@ const App: FC = () => {
   const [search, setSearch] = useState(''); // removed search fro [search, setSearch]
   const [isOpen, setIsOpen] = useState(false);
   const [isDataExpanded, setIsDataExpanded] = useState(false);
+  const [favourite, setFavourite] = useState<string[]>(
+    () => JSON.parse(localStorage.getItem("favourites") ?? "[]")
+  );
   const menuRef = useRef<HTMLInputElement>(null);
 
   const BASE = 'https://api.coingecko.com/api/v3';
@@ -215,14 +218,11 @@ const App: FC = () => {
   };
 
   const fetchDescriptionData = async () => {
-    const controller = new AbortController();
     setIsLoading(true);
     try {
       const res = await axios.get<CryptoDescriptionProps>(descripionUrl, { 
-        headers: { 'x-cg-demo-api-key': import.meta.env.VITE_COINGECKO_API_KEY }, 
-        signal: controller.signal 
+        headers: { 'x-cg-demo-api-key': import.meta.env.VITE_COINGECKO_API_KEY }
       });
-
       setDescriptionCache((prev) => ({
         ...prev,
         [params.id]: res.data.description?.en ?? ''
@@ -232,14 +232,40 @@ const App: FC = () => {
     } finally {
       setIsLoading(false);
     }
-    return () => controller.abort();
-  };
+  }; // Removed contreoller logic as for React useEffects
 
   const getFirstWord = (htmlString: string) => {
     if (!htmlString) return '';
     const cleanText = htmlString.replace(/<[^>]*>/g, '');
     
     return cleanText.trim().split(' ')[0];
+  };
+
+  const handleFavourites = (coin: CryptoDataProps) => {
+    if (favourite.includes(coin.id)) {
+      const newFavourites = favourite.filter((c) => c !== coin.id);
+      localStorage.setItem("favourites", JSON.stringify(newFavourites));
+
+      setFavourite(newFavourites);
+      console.log("STORED remove:", 
+        JSON.parse(localStorage.getItem("favourites") ?? "[]")
+      );
+    } else  {
+      const favourites = JSON.parse(localStorage.getItem("favourites") ?? "[]");
+      // console.log("BEFORE:", favourites);
+      const newFavourites = [
+        ...favourites,
+        coin.id
+      ];
+      // console.log("NEW:", newFavourites);
+      const jsonNewFavs = JSON.stringify(newFavourites);
+      localStorage.setItem("favourites", jsonNewFavs);
+      console.log("STORED add:", 
+        JSON.parse(localStorage.getItem("favourites") ?? "[]")
+      );
+      setFavourite(newFavourites);
+      // console.log("Favourite:", favourite);
+    };
   };
 
   return (
@@ -331,20 +357,42 @@ const App: FC = () => {
             ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 ' : 'text-slate-700/80'}`}
           >
             <div className="flex w-full flex-col items-center">
-              <div className={`flex w-full items-center border-b mb-2 pb-2
+              <div className={`flex justify-between w-full items-center border-b -mt-1.5 mb-2 pb-2
                 ${themeConfig[currentIndex].label === 'Night' ? 'border-mist-200/20' : 'border-mist-900/20'}
               `}>
-                <Flame className="h-5 w-5 text-orange-500 mr-1" strokeWidth={3}/>
-                <h2 className="text-base md:text-lg uppercase font-semibold">
-                  Trending Aegis Crypto
-                </h2>
+                <div className="flex w-full items-center">
+                  <Flame className="h-5 w-5 text-orange-500 mr-1" strokeWidth={3}/>
+                  <h2 className="text-base md:text-lg uppercase font-semibold">
+                    Trending Aegis Crypto
+                  </h2>
+                </div>
+                <div className={`flex shrink-0 ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80' : 'text-slate-700/80'}`}>
+                  <button popoverTarget="favourite-popover" 
+                    className="flex shrink-0 items-center justify-center bg-teal-500 font-bold tracking-wider text-neutral-100
+                      px-3 py-1.5 md:px-4 md:py-2 rounded-md shadow-md/30 hover:bg-teal-500/80 hover:shadow-none
+                      hover:translate-y-0.5 focus:translate-y-0.5 focus:shadow-none
+                      uppercase"
+                  >
+                    <div className="hidden md:inline-flex text-sm lg:text-base">Favourite Crypto</div>
+                    <div className="inline-block md:hidden"><BookHeart className="w-5 h-5 text-white items-center"/></div>
+                  </button>
+                  <div id="favourite-popover" popover="auto" className="bg-transparent top-25 lg:top-20 -left-52 md:-left-44 lg:left-36 scale-55 md:scale-70 lg:scale-85 touch-auto">
+                    <CryptoTable 
+                      coins={coins.filter(coin => favourite.includes(coin.id))} 
+                      historyData={sparkLineData}
+                      trends={trends}
+                      limit={favourite.length}
+                      className="text-base md:text-xl"
+                    />
+                  </div>
+                </div>
               </div>
               <div className="flex w-full items-center gap-1">
                 {trends.slice(0, 8).map((trend, index) => (
                   <button key={trend.id} 
                     className={`flex flex-1 items-center justify-between border-2 border-white/10 bg-[#808080]/10 px-2 py-1 
                       rounded-lg shadow-md hover:shadow-lg hover:border-cyan-300 gap-1 cursor-pointer min-h-10 md:min-h-15 lg:min-h-17
-                      focus:outline-none hover:scale-105
+                      hover:scale-105
                       ${ index <= 1 
                           ? "flex"
                           : index <= 4 
@@ -362,7 +410,7 @@ const App: FC = () => {
                     />
                     <div className="flex flex-col items-center leading-tight">
                       <span className="text-[11px] md:text-xs lg:text-sm hidden md:flex">{trend.name}</span>
-                      <span className="text-xs md:text-[11px] lg:text-xs">{trend.symbol}</span>
+                      <span className="text-[10px] md:text-[11px] lg:text-xs">{trend.symbol}</span>
                     </div>
                     <TrendSparkLine 
                       src={trend.data.sparkline} 
@@ -480,21 +528,21 @@ const App: FC = () => {
                           </div>
                           <div className={` ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80' : 'text-slate-700/80'}`}>
                             <button popoverTarget="my-popover" 
-                              className="flex items-center justify-center bg-teal-500 font-bold tracking-wider text-neutral-100
-                                px-4 py-2 rounded-md shadow-md/30 hover:bg-teal-500/80 hover:shadow-none
+                              className="flex shrink-0 items-center justify-center bg-teal-500 font-bold tracking-wider text-neutral-100
+                                px-3 py-1.5 md:px-4 md:py-2 rounded-md shadow-md/30 hover:bg-teal-500/80 hover:shadow-none
                                 hover:translate-y-0.5 focus:translate-y-0.5 focus:shadow-none
                                 uppercase"
                             >
                               <div className="hidden md:inline-block text-sm lg:text-base">Top 11 Crypto Coin</div>
                               <div className="inline-block md:hidden"><LayoutDashboard className="w-5 h-5 text-white items-center"/></div>
                             </button>
-                            <div id="my-popover" popover="auto" className="bg-transparent top-25 lg:top-10 -left-76 md:-left-55 lg:left-36 scale-40 md:scale-70 lg:scale-85 touch-auto">
+                            <div id="my-popover" popover="auto" className="bg-transparent top-25 lg:top-10 -left-67 md:-left-55 lg:left-36 scale-40 md:scale-70 lg:scale-85 touch-auto">
                               <CryptoTable 
                                 coins={coins} 
                                 historyData={sparkLineData} 
                                 trends={trends} 
                                 limit={11}
-                                className="text-xl "
+                                className="text-lg md:text-xl"
                               />
                             </div>
                           </div>
@@ -511,6 +559,12 @@ const App: FC = () => {
                                   alt={selectedCoin.name}
                                 /> 
                                 {selectedCoin.name}
+                                <Star 
+                                  onClick={() => handleFavourites(selectedCoin)}
+                                  className={`ml-1 ${favourite.includes(selectedCoin.id) 
+                                    ? "text-yellow-200 fill-[#FFD700]" 
+                                    : "text-neutral-300 fill-indigo-800/50" }`}
+                                />
                               </h3>
                               <p className="text-[12px] md:text-base font-black uppercase tracking-wide text-teal-300 ">{selectedCoin.id} // {selectedCoin.symbol.toUpperCase()}</p>
                             </div>
