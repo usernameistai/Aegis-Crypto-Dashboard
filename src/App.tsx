@@ -14,7 +14,8 @@ import CryptoField from "./components/CryptoField";
 import CryptoTable from "./components/CryptoTable";
 import { themeConfig, preload_images } from "./config/themeConfig";
 import { LuSquareMenu } from "react-icons/lu";
-import { BookHeart, ChartCandlestick, Flame, LayoutDashboard, Star, TrendingUp, TrendingUpDown } from "lucide-react";
+import { BookHeart, Star } from "lucide-react";
+import { BookOpenText, ChartCandlestickIcon, FlameIcon, LayoutDashboardIcon, TrendingUpDownIcon, TrendingUpIcon } from "@animateicons/react/lucide";
 import TrendSparkLine from "./components/TrendSparkLine";
 import { Flip, ToastContainer, toast } from 'react-toastify';
 import CryptoSearch from "./components/CryptoSearch";
@@ -74,6 +75,40 @@ const App: FC = () => {
   useEffect(() => {
     document.body.className = themeConfig[currentIndex].className;
   }, [currentIndex]);
+
+  // NOT GOING TO KEEP THIS AS WANT TOAST ALERTS ON TRENDING ALONE
+  // useEffect(() => {
+  //   const controller = new AbortController();
+
+  //   const fetchData = async () => {
+  //     setIsLoading(true);
+
+  //     try {
+  //       const [trendRes, coinRes] = await Promise.all([
+  //         axios.get<TrendingCoins>(trendingUrl, {
+  //           headers: { 'x-cg-demo-api-key': import.meta.env.VITE_COINGECKO_API_KEY }, 
+  //           signal: controller.signal 
+  //         }),
+
+  //         axios.get<CryptoDataProps[]>(url1, {
+  //           headers: { 'x-cg-demo-api-key': import.meta.env.VITE_COINGECKO_API_KEY }, 
+  //           signal: controller.signal 
+  //         })
+  //       ]);
+
+  //       setTrends(trendRes.data.coins.map(coin => coin.item));
+  //       setCoins(coinRes.data);
+  //     } catch (err) {
+  //       if (!axios.isCancel(err)) console.error("CoinGecko fetch error", err);
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   }
+  //   fetchData();
+
+  //   return () => controller.abort();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -244,12 +279,13 @@ const App: FC = () => {
   const handleFavourites = (coin: CryptoDataProps) => {
     if (favourite.includes(coin.id)) {
       const newFavourites = favourite.filter((c) => c !== coin.id);
+
       localStorage.setItem("favourites", JSON.stringify(newFavourites));
 
       setFavourite(newFavourites);
-      console.log("STORED remove:", 
-        JSON.parse(localStorage.getItem("favourites") ?? "[]")
-      );
+      // console.log("STORED remove:", 
+      //   JSON.parse(localStorage.getItem("favourites") ?? "[]")
+      // );
     } else  {
       const favourites = JSON.parse(localStorage.getItem("favourites") ?? "[]");
       // console.log("BEFORE:", favourites);
@@ -259,10 +295,11 @@ const App: FC = () => {
       ];
       // console.log("NEW:", newFavourites);
       const jsonNewFavs = JSON.stringify(newFavourites);
+
       localStorage.setItem("favourites", jsonNewFavs);
-      console.log("STORED add:", 
-        JSON.parse(localStorage.getItem("favourites") ?? "[]")
-      );
+      // console.log("STORED add:", 
+      //   JSON.parse(localStorage.getItem("favourites") ?? "[]")
+      // );
       setFavourite(newFavourites);
       // console.log("Favourite:", favourite);
     };
@@ -361,7 +398,7 @@ const App: FC = () => {
                 ${themeConfig[currentIndex].label === 'Night' ? 'border-mist-200/20' : 'border-mist-900/20'}
               `}>
                 <div className="flex min-w-0 flex-1 items-center">
-                  <Flame className="h-5 w-5 text-orange-500 mr-1" strokeWidth={3}/>
+                  <FlameIcon className="text-orange-500" size={24} />
                   <h2 className="text-base md:text-lg uppercase font-semibold">
                     Trending Aegis Crypto
                   </h2>
@@ -373,8 +410,10 @@ const App: FC = () => {
                       hover:translate-y-0.5 focus:translate-y-0.5 focus:shadow-none
                       uppercase"
                   >
-                    <div className="hidden md:inline-flex text-sm lg:text-base">Favourite Crypto</div>
-                    <div className="inline-block md:hidden"><BookHeart className="w-5 h-5 text-white"/></div>
+                    <div className="flex justify-between text-sm lg:text-base">
+                      <span className="hidden md:inline-flex mr-1">Favourite</span>
+                      <BookHeart className="w-5 h-5 text-white"/>
+                    </div>
                   </button>
                   <div id="favourite-popover" popover="auto" className="bg-transparent top-25 lg:top-20 -left-52 md:-left-44 lg:left-36 scale-55 md:scale-70 lg:scale-85 touch-auto">
                     <CryptoTable 
@@ -432,9 +471,12 @@ const App: FC = () => {
             />
             <label 
               htmlFor="menu-toggle" 
-              className="touch-manipulation md:hidden p-2 fixed top-17 left-4 z-50 
-                bg-neutral900/50 backdrop-blur-sm border border-white/10 text-teal-500
-                rounded-lg cursor-pointer flex items-center gap-2"
+              className={`touch-manipulation md:hidden p-2 fixed top-17 left-4 z-50 
+                bg-neutral900/50 backdrop-blur-sm border border-white/10
+                rounded-lg cursor-pointer flex items-center gap-2
+                ${themeConfig[currentIndex].label === 'Night' || themeConfig[currentIndex].label === 'Summer' || themeConfig[currentIndex].label === 'Spring' || themeConfig[currentIndex].label === 'Autumn' || themeConfig[currentIndex].label === 'Winter'
+                  ? 'text-teal-400 ' : 'text-teal-500'}
+                `}
               role="button"
               aria-label="Toggle Crypto Sidebar Menu"
               aria-expanded={isOpen}
@@ -461,7 +503,11 @@ const App: FC = () => {
                   ${themeConfig[currentIndex].label === 'Night' ? 'border-mist-200/20' : 'border-mist-900/20'}`}
               >
                 <div className="flex items-center">
-                  <ChartCandlestick className="w-6 h-6 mr-1 text-teal-500"/>
+                  <ChartCandlestickIcon 
+                    className={` mr-1 ${themeConfig[currentIndex].label === 'Night' || themeConfig[currentIndex].label === 'Summer' || themeConfig[currentIndex].label === 'Spring' 
+                      ? 'text-teal-400 ' : 'text-teal-500'}`} 
+                    size={24}
+                  />
                   <h2 
                     id="Crypto-Menu-Title"
                     className={`text-base md:text-lg
@@ -517,13 +563,18 @@ const App: FC = () => {
                     <>
                       <div className="relative">
 
-                        <div className={`flex items-center justify-between text-base md:text-lg md:border-b -mt-1 md:mb-4 pb-3
+                        <div className={`flex items-center justify-between text-base md:text-lg md:border-b md:mb-4 md:-mt-1 pb-3
                           ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 border-mist-200/20' : 'text-slate-700/80 border-mist-900/20'}`}
                         >
                           <div id="Main-Data-Title" aria-label="Main-Data-Title"
                             className="flex items-center justify-center md:justify-start uppercase"
                           >
-                            <TrendingUpDown className="w-6 h-6 text-emerald-500 mr-2" strokeWidth={2.75} />
+                            <TrendingUpDownIcon 
+                              className={` mr-2 
+                                ${themeConfig[currentIndex].label === 'Night' || themeConfig[currentIndex].label === 'Summer' || themeConfig[currentIndex].label === 'Spring' 
+                                 ? 'text-teal-400 ' : 'text-teal-500'}`}  
+                                 size={30} 
+                            />
                             <h2><div className="hidden md:inline-block"> Aegis Crypto - </div> {selectedCoin.name} ({selectedCoin.symbol.toUpperCase()}) <div className="hidden md:inline-block">Databoard</div> </h2>
                           </div>
                           <div className={` ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80' : 'text-slate-700/80'}`}>
@@ -533,8 +584,10 @@ const App: FC = () => {
                                 hover:translate-y-0.5 focus:translate-y-0.5 focus:shadow-none
                                 uppercase"
                             >
-                              <div className="hidden md:inline-block text-sm lg:text-base">Top 11 Crypto Coin</div>
-                              <div className="inline-block md:hidden"><LayoutDashboard className="w-5 h-5 text-white items-center"/></div>
+                              <div className="flex justify-between text-white items-center text-sm lg:text-base">
+                                <div className="hidden md:inline-block mr-1">Top 11 Crypto</div>
+                                <LayoutDashboardIcon className="w-5 h-5"/>
+                              </div>
                             </button>
                             <div id="my-popover" popover="auto" className="bg-transparent top-25 lg:top-10 -left-67 md:-left-55 lg:left-36 scale-40 md:scale-70 lg:scale-85 touch-auto">
                               <CryptoTable 
@@ -559,10 +612,10 @@ const App: FC = () => {
                                   alt={selectedCoin.name}
                                 /> 
                                 {selectedCoin.name}
-                                <Star 
+                                <Star
                                   onClick={() => handleFavourites(selectedCoin)}
                                   className={`ml-1 ${favourite.includes(selectedCoin.id) 
-                                    ? "text-yellow-200 fill-[#FFD700]" 
+                                    ? "text-yellow-200 fill-[#FFD700] drop-shadow-[0_0_5px_#FFD700]" 
                                     : "text-neutral-300 fill-indigo-800/50" }`}
                                 />
                               </h3>
@@ -696,7 +749,7 @@ const App: FC = () => {
                 ${themeConfig[currentIndex].label === 'Night' ? 'border-mist-200/20' : 'border-mist-900/20'}`}
               >
                 <div className="flex justify-center">
-                  <TrendingUp className="w-8 h-8 text-emerald-400 mr-2"/>
+                  <TrendingUpIcon className="text-teal-400 mr-2" size={35} />
                   <h2 
                     id="Crypto-Menu-Title"
                     className={`text-base md:text-lg
@@ -712,7 +765,7 @@ const App: FC = () => {
                 coins={coins} 
                 historyData={sparkLineData}
                 trends={trends}
-                limit={10}
+                limit={15}
                 className="text-sm"
               />
             </section>
@@ -730,18 +783,18 @@ const App: FC = () => {
             `}
           >
             <details 
-              className="bg-neutral-700/20 p-3.5 md:p-5 m-4 rounded-lg shadow-lg shadow-neutral-500/50 cursor-pointer"
+              className="bg-neutral-700/20 p-3.5 md:p-5 m-4 rounded-lg shadow-lg shadow-neutral-500/50 tracking-wide cursor-pointer"
               onToggle={(e) => {
                 if (e.currentTarget.open && !descriptionCache[params.id]) fetchDescriptionData();
               }}
             >
               {descriptionCache[params.id] && (
                 <>
-                  <summary className="cursor-pointer">
-                    About {getFirstWord(descriptionCache[params.id])}
+                  <summary className="cursor-pointer flex items-start gap-2 text-[17px] md:text-lg font-semibold">
+                    <BookOpenText className="text-teal-400" size={24} /><span>About {getFirstWord(descriptionCache[params.id])}</span>
                   </summary>
                   <div
-                    className="prose prose-invert py-4"
+                    className="prose prose-invert py-4 font-medium text-[15px] md:text-base"
                     dangerouslySetInnerHTML={{ __html: descriptionCache[params.id] }}
                   />
                 

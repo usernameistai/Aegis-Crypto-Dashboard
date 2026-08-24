@@ -1,5 +1,6 @@
 import React, { useMemo, useRef, useState, type FC } from 'react';
 import type { CryptoDataProps } from '@/types/cryptoDataTypes';
+import { SearchIcon } from '@animateicons/react/lucide';
 
 interface CryptoSearchProps {
   coins: CryptoDataProps[];
@@ -74,7 +75,9 @@ const CryptoSearch:FC<CryptoSearchProps> = ({ coins, handleSelectCoin }) => {
             if (menuRef.current) menuRef.current.checked = false;
           }}
         >
-          Search
+          <div className="flex justify-center">
+            <SearchIcon className='mr-1' size={20}/><div className="">Search</div>
+          </div>
         </button>
         
         {search && filteredCoins.length > 0 && (
