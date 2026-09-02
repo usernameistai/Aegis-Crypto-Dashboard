@@ -77,7 +77,6 @@ const App: FC = () => {
   useEffect(() => {
     document.body.className = themeConfig[currentIndex].className;
   }, [currentIndex]);
-
   {/* useEffects for Errors */}
   useEffect(() => {
     if ( isCoinsError || isTrendsError || isPriceDataError ) {
@@ -201,7 +200,6 @@ const App: FC = () => {
     return cleanText.trim().split(' ')[0];
   };
 
-
   return (
     <>
       <div className="data-shield" aria-hidden={isLoading ? "true" : "false"}>
@@ -242,6 +240,7 @@ const App: FC = () => {
             />
           ))}
 
+          {/* Theme Selector */}
           <section aria-label="Theme selection"
             className={`flex backdrop-blur-lg border border-white/10
             rounded-b-md p-1 shadow-[0_4px_30px_rgba(0,0,0,0.1)] justify-between
@@ -360,7 +359,7 @@ const App: FC = () => {
           </section>
 
           {/* Aside and Main */}
-          <div className="relative grid grid-cols-12">
+          <section className="relative grid grid-cols-12">
             <input 
               type="checkbox" 
               id="menu-toggle" 
@@ -385,6 +384,7 @@ const App: FC = () => {
               <div className="ml-1 font-mono font-semibold uppercase tracking-wider">Crypto Sidebar</div>
             </label>
             
+            {/* Sidebar & Crypto Search */}
             <aside 
               className="min-h-dvh fixed md:static z-100 top-25 right-0 bottom-0 left-0 md:top-0 transform 
                 transition-transform duration-300 translate-x-full peer-checked:translate-x-0 
@@ -630,6 +630,7 @@ const App: FC = () => {
               }
             </main>
             
+            {/* Crypto Table*/}
             <section className="relative inset-0 z-40
               transform transition-transform duration-300
               md:static col-span-full md:translate-x-0
@@ -662,8 +663,9 @@ const App: FC = () => {
               />
             </section>
 
-          </div>
-
+          </section>
+                    
+          {/* Details */}
           <section aria-label="Detailed description of the selected crypto coin"
             className={`relative inset-0 z-40 transform transition-transform
             duration-300 md:static col-span-full md:translate-x-0 bg-[#808080]/10
@@ -695,6 +697,7 @@ const App: FC = () => {
             </details>
           </section>
 
+          {/* Theme Selector */}
           <section aria-label="Theme selection"
             className={`flex backdrop-blur-lg border border-white/10
             rounded-t-md p-1 shadow-[0_4px_30px_rgba(0,0,0,0.1)] justify-between

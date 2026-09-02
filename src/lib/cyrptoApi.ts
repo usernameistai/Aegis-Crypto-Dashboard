@@ -30,7 +30,6 @@ export const getTrends = async (signal: AbortSignal) => {
   return data.coins.map(coin => coin.item);
 };
 
-
 export const useCoins = () => {
   return useQuery({
     queryKey: ['coins'],
@@ -65,7 +64,7 @@ export const useTrends = () => {
       { 
         pending: "Trending Data Fetching",
         success: "Well Slap My Thighs and call me Shirley",
-        error: "I'm sory Dave..."
+        error: "I'm sorry Dave..."
       }
     ),
     staleTime: 1000 * 60 * 60 * 4,
