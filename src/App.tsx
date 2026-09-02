@@ -1,48 +1,50 @@
-import { useEffect, useMemo, useState, useRef, type FC } from "react";
-import axios from "axios";
+import { useEffect, useMemo, useRef, useState, type FC } from "react";
+import { themeConfig, preload_images } from "./config/themeConfig";
+import { useCoins, usePriceData, useTrends } from "./lib/cyrptoApi";
 import type { 
   CryptoDataProps, 
   CryptoTrendsProps, 
-  CryptoDataHistory,
-  PriceResponse, 
-  CryptoDataPoint, 
-  TrendingCoins, 
+  CryptoDataHistory, 
+  CryptoDataPoint,
   CryptoDescriptionProps 
 } from "./types/cryptoDataTypes";
 import CryptoChart from "./components/CryptoChart";
 import CryptoField from "./components/CryptoField";
+import CryptoSearch from "./components/CryptoSearch";
+import TrendSparkLine from "./components/TrendSparkLine";
 import CryptoTable from "./components/CryptoTable";
-import { themeConfig, preload_images } from "./config/themeConfig";
 import { LuSquareMenu } from "react-icons/lu";
 import { BookHeart, Star } from "lucide-react";
-import { BookOpenText, ChartCandlestickIcon, FlameIcon, LayoutDashboardIcon, TrendingUpDownIcon, TrendingUpIcon } from "@animateicons/react/lucide";
-import TrendSparkLine from "./components/TrendSparkLine";
+import { 
+  BookOpenText, 
+  ChartCandlestickIcon, 
+  FlameIcon, 
+  LayoutDashboardIcon, 
+  TrendingUpDownIcon, 
+  TrendingUpIcon 
+} from "@animateicons/react/lucide";
 import { Flip, ToastContainer, toast } from 'react-toastify';
-import CryptoSearch from "./components/CryptoSearch";
+import axios from "axios";
 
 const App: FC = () => {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const [coins, setCoins] = useState<CryptoDataProps[]>([]);
   const [selectedCoin, setSelectedCoin] = useState<CryptoDataProps | null>(null);
-  const [priceData, setPriceData] = useState<PriceResponse | null>(null);
   const [params, setParams] = useState<CryptoDataHistory>({ id: `bitcoin`, currency: 'gbp', days: 90 });
-  const [trends, setTrends] = useState<CryptoTrendsProps[]>([]);
   const [descriptionCache, setDescriptionCache] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [search, setSearch] = useState(''); // removed search fro [search, setSearch]
+  const [search, setSearch] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [isDataExpanded, setIsDataExpanded] = useState(false);
-  const [favourite, setFavourite] = useState<string[]>(
-    () => JSON.parse(localStorage.getItem("favourites") ?? "[]")
-  );
+  const [favourite, setFavourite] = useState<string[]>(() => JSON.parse(localStorage.getItem("favourites") ?? "[]"));
+  const { data: trends = [], isLoading: isTrendsLoading, error: isTrendsError } = useTrends();
+  const { data: coins = [], isLoading: isCoinsLoading, error: isCoinsError } = useCoins();
+  const { data: priceData, isLoading: isPriceDataLoading, error: isPriceDataError } = usePriceData(params.id, params.currency, params.days)
   const menuRef = useRef<HTMLInputElement>(null);
 
   const BASE = 'https://api.coingecko.com/api/v3';
-  const trendingUrl = useMemo(() => `${BASE}/search/trending`, []);
-  const url1 = useMemo(() => `${BASE}/coins/markets?vs_currency=gbp&order=market_cap_desc&per_page=250&page=1&sparkline=true`, []);
-  const url2 = useMemo(() => `${BASE}/coins/${params.id}/market_chart?vs_currency=${params.currency}&days=${params.days}`, [params.id, params.currency, params.days]);
   const descripionUrl = useMemo(() => `${BASE}/coins/${params.id}?tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=true`, [params.id]);
-  
+ 
+  {/* Preload Images for smoothness */}
   useEffect(() => {
     let loadedCount = 0;
 
@@ -71,117 +73,17 @@ const App: FC = () => {
       behavior: prefersReducedMotion ? 'instant' : 'smooth',
     });
   }, []);
-
+  {/* Theme image class selector */}
   useEffect(() => {
     document.body.className = themeConfig[currentIndex].className;
   }, [currentIndex]);
 
-  // NOT GOING TO KEEP THIS AS WANT TOAST ALERTS ON TRENDING ALONE
-  // useEffect(() => {
-  //   const controller = new AbortController();
-
-  //   const fetchData = async () => {
-  //     setIsLoading(true);
-
-  //     try {
-  //       const [trendRes, coinRes] = await Promise.all([
-  //         axios.get<TrendingCoins>(trendingUrl, {
-  //           headers: { 'x-cg-demo-api-key': import.meta.env.VITE_COINGECKO_API_KEY }, 
-  //           signal: controller.signal 
-  //         }),
-
-  //         axios.get<CryptoDataProps[]>(url1, {
-  //           headers: { 'x-cg-demo-api-key': import.meta.env.VITE_COINGECKO_API_KEY }, 
-  //           signal: controller.signal 
-  //         })
-  //       ]);
-
-  //       setTrends(trendRes.data.coins.map(coin => coin.item));
-  //       setCoins(coinRes.data);
-  //     } catch (err) {
-  //       if (!axios.isCancel(err)) console.error("CoinGecko fetch error", err);
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   }
-  //   fetchData();
-
-  //   return () => controller.abort();
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
-
+  {/* useEffects for Errors */}
   useEffect(() => {
-    const controller = new AbortController();
-
-    const fetchTrends = async () => {
-      setIsLoading(true);
-      try {
-        const res = await axios.get<TrendingCoins>(trendingUrl, { 
-          headers: { 'x-cg-demo-api-key': import.meta.env.VITE_COINGECKO_API_KEY }, 
-          signal: controller.signal 
-        });
-        setTrends(res.data.coins.map(coin => coin.item));
-      } catch (err) {
-        if (!axios.isCancel(err)) console.error("Coin trend list fetch error", err);
-      } finally {
-        setIsLoading(false);
-      }
+    if ( isCoinsError || isTrendsError || isPriceDataError ) {
+      toast.error("Something has gone wrong, please ctrl + shift + 'i' for developer console");
     }
-    toast.promise(
-      fetchTrends(),
-      {
-        pending: "Trending Data Fetching",
-        success: "Well Slap My Thighs and call me Shirley",
-        error: "I'm sory Dave..."
-      }
-    )
-    return () => controller.abort();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    const controller  = new AbortController();
-
-    const fetchCoins = async () => {
-      setIsLoading(true);
-      try {
-        const res = await axios.get<CryptoDataProps[]>(url1, { 
-          headers: { 'x-cg-demo-api-key': import.meta.env.VITE_COINGECKO_API_KEY }, 
-          signal: controller.signal 
-        });
-        setCoins(res.data);
-      } catch (err) {
-        if (!axios.isCancel(err)) console.error("Coin list fetch error", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchCoins();
-    return () => controller.abort();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const fetchCryptoChartData = async () => {
-      // setPriceData(null);
-      setIsLoading(true);
-      try {
-        const res = await axios.get<PriceResponse>(url2, { 
-          headers: { 'x-cg-demo-api-key': import.meta.env.VITE_COINGECKO_API_KEY }, 
-          signal: controller.signal 
-        });
-        setPriceData(res.data);
-      } catch (err) {
-        if (!axios.isCancel(err)) console.error("Coin list fetch error", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchCryptoChartData();
-    return () => controller.abort();
-  }, [url2]);
+  }, [isCoinsError, isTrendsError, isPriceDataError]);
 
   const createSparkLineData = ( coins: CryptoDataProps[] ): Record<string, CryptoDataPoint[]> => {
     const result: Record<string, CryptoDataPoint[]> = {};
@@ -203,7 +105,6 @@ const App: FC = () => {
 
     return result;
   };
-
   const sparkLineData = useMemo(
     () => createSparkLineData(coins),
     [coins]
@@ -252,6 +153,30 @@ const App: FC = () => {
     });
   };
 
+  const handleFavourites = (coin: CryptoDataProps) => {
+    if (favourite.includes(coin.id)) {
+      const newFavourites = favourite.filter((c) => c !== coin.id);
+
+      localStorage.setItem("favourites", JSON.stringify(newFavourites));
+
+      setFavourite(newFavourites);
+    } else  {
+
+      const favourites = JSON.parse(localStorage.getItem("favourites") ?? "[]");
+
+      const newFavourites = [
+        ...favourites,
+        coin.id
+      ];
+
+      const jsonNewFavs = JSON.stringify(newFavourites);
+
+      localStorage.setItem("favourites", jsonNewFavs);
+      
+      setFavourite(newFavourites);
+    };
+  };
+
   const fetchDescriptionData = async () => {
     setIsLoading(true);
     try {
@@ -267,7 +192,7 @@ const App: FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }; // Removed contreoller logic as for React useEffects
+  };
 
   const getFirstWord = (htmlString: string) => {
     if (!htmlString) return '';
@@ -276,41 +201,13 @@ const App: FC = () => {
     return cleanText.trim().split(' ')[0];
   };
 
-  const handleFavourites = (coin: CryptoDataProps) => {
-    if (favourite.includes(coin.id)) {
-      const newFavourites = favourite.filter((c) => c !== coin.id);
-
-      localStorage.setItem("favourites", JSON.stringify(newFavourites));
-
-      setFavourite(newFavourites);
-      // console.log("STORED remove:", 
-      //   JSON.parse(localStorage.getItem("favourites") ?? "[]")
-      // );
-    } else  {
-      const favourites = JSON.parse(localStorage.getItem("favourites") ?? "[]");
-      // console.log("BEFORE:", favourites);
-      const newFavourites = [
-        ...favourites,
-        coin.id
-      ];
-      // console.log("NEW:", newFavourites);
-      const jsonNewFavs = JSON.stringify(newFavourites);
-
-      localStorage.setItem("favourites", jsonNewFavs);
-      // console.log("STORED add:", 
-      //   JSON.parse(localStorage.getItem("favourites") ?? "[]")
-      // );
-      setFavourite(newFavourites);
-      // console.log("Favourite:", favourite);
-    };
-  };
 
   return (
     <>
       <div className="data-shield" aria-hidden={isLoading ? "true" : "false"}>
         <div className="relative h-dvh bg-neutral-200/20 antialiased overflow-x-hidden">
           
-          {isLoading && (
+          {( isLoading || isCoinsLoading || isTrendsLoading || isPriceDataLoading ) && (
             <>
               <div role="status" aria-live="polite" aria-label="Loading Crypto Data"
                 className="fixed inset-0 w-screen h-screen bg-neutral-900/80 
@@ -380,6 +277,7 @@ const App: FC = () => {
             autoClose={1250}
           />
           
+          {/* Main Title */}
           <h1 className={`top-0 mt-3 mb-10 md:my-3 text-center text-[#808080]
             text-xl md:text-4xl uppercase font-black tracking-[0.225em]
             ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80' : 'text-[#808080]'}`}
@@ -461,7 +359,7 @@ const App: FC = () => {
             </div>
           </section>
 
-          {/* Menu Select for Coins */}
+          {/* Aside and Main */}
           <div className="relative grid grid-cols-12">
             <input 
               type="checkbox" 
@@ -521,7 +419,7 @@ const App: FC = () => {
 
               <CryptoSearch coins={coins} handleSelectCoin={handleSelectCoin}/>
               
-             {coins && 
+              { coins && 
                 <nav aria-label="Crypto Coin Selection">
                   <ul className="flex flex-col gap-y-2 text-slate-700/80">
                     {coins.slice(0, 11).map((c) => (
@@ -532,12 +430,7 @@ const App: FC = () => {
                             hover:text-white hover:bg-teal-300/20 hover:border-mist-100/50
                             ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80' : 'text-slate-700/80'}
                             `}
-                          onClick={() => {
-                            setSelectedCoin(c);
-                            setParams((prev) => ({ ...prev, id: c.id }));
-                            if (menuRef.current) menuRef.current.checked = false;
-                            // handleSelectCoin(c);
-                          }}  
+                          onClick={() => handleSelectCoin(c)}
                         >
                           {c.id}
                         </button>
@@ -734,7 +627,6 @@ const App: FC = () => {
                     </>
                   )}
                 </section>
-
               }
             </main>
             
