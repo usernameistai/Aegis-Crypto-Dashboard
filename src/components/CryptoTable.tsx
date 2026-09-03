@@ -8,11 +8,12 @@ import Cursor from './Cursor';
 const right = "py-3 pr-4 text-right border-b border-slate-200";
 const left = "py-3 pr-4 text-left border-b border-slate-200";
 const hiddenTable = "hidden md:table-cell";
+const trendSpark = "h-10 w-24 ml-auto object-contain";
 
 const CryptoRow = ({ coin, history, trend }: { coin: CryptoDataProps, history: CryptoDataPoint[], trend?: CryptoTrendsProps }) => {
   
   return (
-    <TableRow className='relative font-semibold tabular-nums'>
+    <TableRow className='relative font-semibold tabular-nums hover:relative hover:z-50'>
       <TableCell className={`${left} pl-2`}>
         <div className="flex items-center">
           <img src={coin.image} alt={coin.name} className='h-5 w-5 my-auto mr-2'/>
@@ -25,27 +26,24 @@ const CryptoRow = ({ coin, history, trend }: { coin: CryptoDataProps, history: C
       <TableCell className={left}>{coin.market_cap_rank}</TableCell>
       <TableCell className='border-b border-slate-200'/>
       <TableCell className={right}>£{coin.current_price}</TableCell>
-      <TableCell className={`${right} ${(coin.price_change_percentage_24h ?? 0) >= 0 ? 'text-emerald-400' : 'text-red-600'}`}>{(coin.price_change_percentage_24h ?? 0) >= 0 ? '▲' : '▼'} {coin.price_change_percentage_24h ?? 0}%</TableCell>
+      <TableCell className={`${right} ${(coin.price_change_percentage_24h ?? 0) >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>{(coin.price_change_percentage_24h ?? 0) >= 0 ? '▲' : '▼'} {coin.price_change_percentage_24h ?? 0}%</TableCell>
       <TableCell className={`${right} ${hiddenTable}`}>£{coin.high_24h}</TableCell>
       <TableCell className={`${right} ${hiddenTable}`}>£{coin.low_24h}</TableCell>
-      <TableCell className={`${right} ${(coin.price_change_24h ?? 0) >= 0 ? 'text-emerald-400' : 'text-red-600'}`}>
+      <TableCell className={`${right} ${(coin.price_change_24h ?? 0) >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
         { coin.price_change_24h === null
           ? "£ N/A"
           : `${coin.price_change_24h >= 0 ? "▲" : "▼"} £${coin.price_change_24h.toFixed(4)}`
         }
       </TableCell>
       <TableCell className={`${right} ${hiddenTable}`}>{((coin.total_volume) / 1e9).toFixed(4)} B</TableCell>
-      <TableCell className={`${right} ${(coin.market_cap_change_percentage_24h ?? 0) >= 0 ? 'text-emerald-400' : 'text-red-600'}`}>{(coin.market_cap_change_percentage_24h ?? 0) >= 0 ? '▲' : '▼'} {coin.market_cap_change_percentage_24h ?? 0}%</TableCell>
+      <TableCell className={`${right} ${(coin.market_cap_change_percentage_24h ?? 0) >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>{(coin.market_cap_change_percentage_24h ?? 0) >= 0 ? '▲' : '▼'} {coin.market_cap_change_percentage_24h ?? 0}%</TableCell>
       <TableCell className={right}>
-        {trend?.data?.sparkline ? (
-          <img
-            src={trend.data.sparkline}
-            alt=""
-            className="h-10 w-24 ml-auto object-contain"
-          />
-        ) : (
-          <SparkLine data={history}/>
-        )}
+        {history && history.length > 0 
+          ? <SparkLine data={history}/> 
+          : trend?.data?.sparkline 
+            ? <img src={trend.data.sparkline} alt="" className={trendSpark} /> 
+            : ''
+        }
       </TableCell>
     </TableRow>
   )
@@ -56,7 +54,7 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ coins, historyData, trends, l
   return (
     <>
       <div className="relative bg-white/90 rounded-lg shadow-xl shadow-[#808080]/70 mx-3 my-5 px-3 py-2">
-        <Table className={`text-slate-700/80 border-separate border-spacing-y-0 ${className}`}>
+        <Table className={`text-slate-700/85 border-separate border-spacing-y-0 ${className}`}>
           <TableCaption className='top-0'>
             Top {limit} Crypto Coins by rank
           </TableCaption>

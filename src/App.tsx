@@ -46,32 +46,39 @@ const App: FC = () => {
  
   {/* Preload Images for smoothness */}
   useEffect(() => {
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
     let loadedCount = 0;
+    let timeoutId: number | undefined = undefined;
+
+    const handleImageLoad = () => {
+      loadedCount++;
+      if (loadedCount === preload_images.length) {
+        setIsLoading(false);
+        
+        timeoutId = window.setTimeout(() => {
+          const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.scrollTo({
+            top: 0,
+            behavior: prefersReducedMotion ? 'instant' : 'smooth',
+          });
+        }, 0);
+      }
+    };
 
     preload_images.forEach((src) => {
       const img = new Image();
       img.src = src;
-
-      img.onload = () => {
-      loadedCount++;
-      if (loadedCount === preload_images.length) {
-          setIsLoading(false);
-        }
-      };
-
-      img.onerror = () => {
-        loadedCount++;
-        if (loadedCount === preload_images.length) {
-          setIsLoading(false);
-        }
-      };
+      img.onload = handleImageLoad;
+      img.onerror = handleImageLoad;
     });
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    window.scrollTo({
-      top: 0,
-      behavior: prefersReducedMotion ? 'instant' : 'smooth',
-    });
+    return () => {
+      if (timeoutId) {
+        window.clearTimeout(timeoutId ?? 0);
+      }
+    };
   }, []);
   {/* Theme image class selector */}
   useEffect(() => {
@@ -87,9 +94,10 @@ const App: FC = () => {
   const createSparkLineData = ( coins: CryptoDataProps[] ): Record<string, CryptoDataPoint[]> => {
     const result: Record<string, CryptoDataPoint[]> = {};
 
+    const usdToGBP = 0.7453;
+
     coins.forEach((coin) => {
       const prices = coin.sparkline_in_7d?.price;
-
       if (!prices?.length) return;
 
       const interval = (7 * 24 * 3600 * 1000) / (prices.length - 1);
@@ -98,7 +106,7 @@ const App: FC = () => {
         date: new Date(
           Date.now() - (prices.length - 1 - i) * interval
         ).toISOString(),
-        price,
+        price: price * usdToGBP,
       }));
     });
 
@@ -659,7 +667,7 @@ const App: FC = () => {
                 historyData={sparkLineData}
                 trends={trends}
                 limit={15}
-                className="text-sm"
+                className="text-sm md:text-base tracking-wide md:tracking-normal"
               />
             </section>
 
