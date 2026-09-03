@@ -34,7 +34,7 @@ const SparkLine = ({ data, sparklineUrl, className = "" }: SparkLineProps) => {
     <>
       <div className={sparklineClass}>
         <ChartContainer config={cryptoChartConfig} className='h-full w-full'>
-          <ResponsiveContainer width={96} height={40}>
+          <ResponsiveContainer width={96} height={40} initialDimension={{ width: 96, height: 40}}>
             <LineChart data={data} margin={{ top: 2, right: 0, bottom: 2, left: 0 }}>
               <XAxis dataKey="date" hide domain={['dataMin', 'dataMax']} />
               <YAxis hide domain={['dataMin', 'dataMax']} />
