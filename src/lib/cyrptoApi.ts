@@ -8,7 +8,7 @@ import type {
 import { toast } from "react-toastify";
 
 const BASE = 'https://api.coingecko.com/api/v3';
-const url1 = `${BASE}/coins/markets?vs_currency=gbp&order=market_cap_desc&per_page=250&page=1&sparkline=true`;
+const url1 = `${BASE}/coins/markets?vs_currency=gbp&order=market_cap_desc&per_page=100&page=1&sparkline=true`;
 const trendingUrl = `${BASE}/search/trending`;
 
 const fetchJson = async <T,>( url: string, signal: AbortSignal ): Promise<T> => {
@@ -34,8 +34,15 @@ export const useCoins = () => {
   return useQuery({
     queryKey: ['coins'],
     queryFn: ({ signal }) => getCoins(signal),
-    staleTime: 1000 * 60,
+    staleTime: 1000 * 60 * 60 * 5,
     refetchOnWindowFocus: false,
+    retry: (count, error) => {
+      if (axios.isAxiosError(error) && error.response?.status === 429) {
+        return false;
+      }
+      return count < 1;
+    },
+    refetchOnReconnect: false, // network blips won't trigger 3 simultaneous refetches
   });
 };
 
@@ -51,8 +58,15 @@ export const usePriceData = (
 
       return fetchJson<PriceResponse>(url2, signal);
     },
-    staleTime: 1000 * 60 * 60 * 2,
+    staleTime: 1000 * 60 * 60 * 5,
     refetchOnWindowFocus: false,
+    retry: (count, error) => {
+      if (axios.isAxiosError(error) && error.response?.status === 429) {
+        return false;
+      }
+      return count < 1;
+    },
+    refetchOnReconnect: false,
   });
 };
 
@@ -67,7 +81,14 @@ export const useTrends = () => {
         error: "I'm sorry Dave..."
       }
     ),
-    staleTime: 1000 * 60 * 60 * 4,
+    staleTime: 1000 * 60 * 60 * 24,
     refetchOnWindowFocus: false,
+    retry: (count, error) => {
+      if (axios.isAxiosError(error) && error.response?.status === 429) {
+        return false;
+      }
+      return count < 1;
+    },
+    refetchOnReconnect: false,
   });
 };
