@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import type { 
   PriceResponse,
   CryptoDataProps, 
@@ -67,6 +67,7 @@ export const usePriceData = (
       return count < 1;
     },
     refetchOnReconnect: false,
+    placeholderData: keepPreviousData,
   });
 };
 

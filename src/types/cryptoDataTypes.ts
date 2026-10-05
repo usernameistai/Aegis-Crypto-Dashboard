@@ -77,6 +77,7 @@ export interface CryptoChartProps {
   data: CryptoDataPoint[];
   days: number;
   onDaysChange: (days: number) => void;
+  isFetching?: boolean;
 };
 
 export interface PriceResponse {

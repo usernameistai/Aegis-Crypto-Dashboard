@@ -29,7 +29,7 @@ const SparkLine = ({ data, sparklineUrl, className = "" }: SparkLineProps) => {
   
   return (
     <>
-      <div className={`${sparklineClass}`} style={{ width: "100%", height: "100%" }}>
+      <div className={`${sparklineClass}`}>
         <ResponsiveContainer width={96} height={40} >
           <LineChart data={data} margin={{ top: 2, right: 0, bottom: 2, left: 0 }} >
             <XAxis dataKey="date" hide domain={['dataMin', 'dataMax']} />

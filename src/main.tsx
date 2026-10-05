@@ -24,7 +24,7 @@ const queryClient = new QueryClient({
   }),
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 10,
+      staleTime: 1000 * 60 * 60 * 3, // updated fro 1-0 minutes to 3 hours
       gcTime: 1000 * 60 * 60 * 24,
       refetchOnWindowFocus: false,
     }
