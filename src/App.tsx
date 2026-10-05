@@ -24,6 +24,7 @@ import {
   TrendingUpIcon,
 } from "@animateicons/react/lucide";
 import type {
+  BookOpenIconHandle,
   ChartCandlestickIconHandle,
   FlameIconHandle,
   TrendingUpIconHandle,
@@ -58,6 +59,7 @@ const App: FC = () => {
   const chartCandleRef = useRef<ChartCandlestickIconHandle>(null);
   const trendingRef = useRef<TrendingUpDownIconHandle>(null);
   const trendingUpRef = useRef<TrendingUpIconHandle>(null);
+  const bookRef = useRef<BookOpenIconHandle>(null);
 
   const BASE = 'https://api.coingecko.com/api/v3';
   const descripionUrl = useMemo(() => `${BASE}/coins/${params.id}?tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=true`, [params.id]);
@@ -447,7 +449,7 @@ const App: FC = () => {
                         #{coin.market_cap_rank}
                       </span>
                       <span className="text-xs text-slate-200 font-semibold">
-                        ${coin.current_price.toLocaleString()}
+                        ${coin.current_price.toPrecision(5).toLocaleString()}
                       </span>
                       <span className={`text-[10px] px-1.5 py-0.5 rounded tracking-wide ${
                         (coin.price_change_percentage_24h ?? 0) >= 0 
@@ -759,7 +761,11 @@ const App: FC = () => {
                   onMouseEnter={() => trendingUpRef.current?.startAnimation()}
                   onMouseLeave={() => trendingUpRef.current?.stopAnimation()}
                 >
-                  <TrendingUpIcon className="text-teal-400 mr-2" size={35} ref={trendingUpRef}/>
+                  <TrendingUpIcon 
+                    className="text-teal-400 mr-2" 
+                    size={35} 
+                    ref={trendingUpRef}
+                  />
                   <h2 
                     id="Crypto-Menu-Title"
                     className={`text-base md:text-lg
@@ -778,7 +784,6 @@ const App: FC = () => {
                 className="text-sm md:text-base tracking-wide md:tracking-normal"
               />
             </section>
-
           </section>
                     
           {/* Details */}
@@ -800,8 +805,16 @@ const App: FC = () => {
             >
               {descriptionCache[params.id] && (
                 <>
-                  <summary className="cursor-pointer flex items-start gap-2 text-[17px] md:text-lg font-semibold">
-                    <BookOpenText className="text-teal-400" size={24} /><span>About {getFirstWord(descriptionCache[params.id])}</span>
+                  <summary className="cursor-pointer flex items-start gap-2 text-[17px] md:text-lg font-semibold"
+                    onMouseEnter={() => bookRef.current?.startAnimation()}
+                    onMouseLeave={() => bookRef.current?.stopAnimation()}
+                  >
+                    <BookOpenText 
+                      className="text-teal-400" 
+                      size={24}
+                      ref={bookRef}
+                    />
+                    <span>About {getFirstWord(descriptionCache[params.id])}</span>
                   </summary>
                   <div
                     className="prose prose-invert py-4 font-medium text-[15px] md:text-base"
