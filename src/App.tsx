@@ -259,7 +259,7 @@ const App: FC = () => {
 
           {/* Theme Selector */}
           <section aria-label="Theme selection"
-            className={`flex backdrop-blur-lg border border-white/10
+            className={`flex backdrop-blur-md border border-white/10
             rounded-b-md p-1 shadow-[0_4px_30px_rgba(0,0,0,0.1)] justify-between
             ${themeConfig[currentIndex].label === 'Default' ? 'bg-neutral-400/30' : 'bg-white/5'}`}
           >
@@ -303,7 +303,7 @@ const App: FC = () => {
 
           {/* Trending Crypto Coins */}
           <section aria-label="Trending Crypto List Horizontal"
-            className={`flex bg-[#808080]/10 backdrop-blur-lg border-[1.5px] border-white/20 shadow-xl 
+            className={`flex bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 shadow-xl 
             shadow-[#808080]/60 p-2 md:p-4 m-4 rounded-lg
             ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 ' : 'text-slate-700/80'}`}
           >
@@ -380,7 +380,7 @@ const App: FC = () => {
 
           {/* Favourite Crypto Coins */}
           <section aria-label="Favourite Crypto Coins"
-            className={`col-span-full bg-[#808080]/10 backdrop-blur-lg border-[1.5px]
+            className={`col-span-full bg-[#808080]/10 backdrop-blur-md border-[1.5px]
              border-white/20 shadow-xl shadow-[#808080]/60 p-2 md:p-4 m-4 rounded-lg 
              flex items-center gap-3 overflow-x-auto touch-pan-x
              ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80 ' : 'text-slate-700/80'}`}
@@ -495,7 +495,7 @@ const App: FC = () => {
               className="min-h-dvh fixed md:static z-100 top-25 right-0 bottom-0 left-0 md:top-0 transform 
                 transition-transform duration-300 translate-x-full peer-checked:translate-x-0 
                 md:col-span-3 lg:col-span-2 md:translate-x-0 peer-checked:left-0
-              bg-[#808080]/10 backdrop-blur-lg border-[1.5px] border-white/20 shadow-xl 
+              bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 shadow-xl 
                 shadow-[#808080]/70 p-2 md:p-4 m-4 rounded-lg
                 overflow-y-auto touch-pan-y overscroll-contain"
               id="Crypto-Sidebar"
@@ -557,7 +557,7 @@ const App: FC = () => {
 
             {/* Main Data Dashboard */}
             <main className="relative min-h-dvh col-span-12 md:col-span-9 lg:col-span-10
-              bg-[#808080]/10 backdrop-blur-lg border-[1.5px] border-white/20 
+              bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 
               shadow-xl shadow-[#808080]/70 shrink-0 p-2 md:p-4 m-4 rounded-lg
               touch-pan-y overscroll-contain"
             >
@@ -748,7 +748,7 @@ const App: FC = () => {
             <section className="relative inset-0 z-40
               transform transition-transform duration-300
               md:static col-span-full md:translate-x-0
-            bg-[#808080]/10 backdrop-blur-lg border-[1.5px] border-white/20 shadow-xl 
+            bg-[#808080]/10 backdrop-blur-md border-[1.5px] border-white/20 shadow-xl 
               shadow-[#808080]/70 shrink-0 p-2 md:p-4 m-4 rounded-lg
               overflow-y-auto touch-pan-y"
             >
@@ -785,7 +785,7 @@ const App: FC = () => {
           <section aria-label="Detailed description of the selected crypto coin"
             className={`relative inset-0 z-40 transform transition-transform
             duration-300 md:static col-span-full md:translate-x-0 bg-[#808080]/10
-            backdrop-blur-lg border-[1.5px] border-white/20 shadow-xl shadow-[#808080]/70
+            backdrop-blur-md border-[1.5px] border-white/20 shadow-xl shadow-[#808080]/70
             shrink-0 p-2 md:p-4 m-4 rounded-lg overflow-y-auto touch-pan-y
             ${themeConfig[currentIndex].label === 'Night' 
               || themeConfig[currentIndex].label === 'Autumn' 
@@ -815,7 +815,7 @@ const App: FC = () => {
 
           {/* Theme Selector */}
           <section aria-label="Theme selection"
-            className={`flex backdrop-blur-lg border border-white/10
+            className={`flex backdrop-blur-md border border-white/10
             rounded-t-md p-1 shadow-[0_4px_30px_rgba(0,0,0,0.1)] justify-between
             ${themeConfig[currentIndex].label === 'Default' ? 'bg-neutral-400/50' : 'bg-white/5'}`}
           >
