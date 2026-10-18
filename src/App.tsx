@@ -322,28 +322,6 @@ const App: FC = () => {
                     Trending Aegis Crypto
                   </h2>
                 </div>
-                {/* <div className={`flex shrink-0 ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80' : 'text-slate-700/80'}`}>
-                  <button popoverTarget="favourite-popover" 
-                    className="flex shrink-0 items-center justify-center bg-teal-500 font-bold tracking-wider text-neutral-100 leading-5
-                      px-3 py-1.5 md:px-4 md:py-2 rounded-md shadow-md/30 hover:bg-teal-500/80 hover:shadow-none
-                      hover:translate-y-0.5 focus:translate-y-0.5 focus:shadow-none
-                      uppercase"
-                  >
-                    <div className="flex justify-between text-sm lg:text-base">
-                      <span className="hidden md:inline-flex mr-1">Favourite</span>
-                      <BookHeart className="w-5 h-5 text-white"/>
-                    </div>
-                  </button>
-                  <div id="favourite-popover" popover="auto" className="bg-transparent top-25 lg:top-20 -left-52 md:-left-44 lg:left-36 scale-55 md:scale-70 lg:scale-85 touch-auto">
-                    <CryptoTable 
-                      coins={coins.filter(coin => favourite.includes(coin.id))} 
-                      historyData={sparkLineData}
-                      trends={trends}
-                      limit={favourite.length}
-                      className="text-base md:text-xl"
-                    />
-                  </div>
-                </div> */}
               </div>
               <div className="flex w-full items-center gap-1">
                 {trends.slice(0, 8).map((trend, index) => (
@@ -856,3 +834,26 @@ const App: FC = () => {
 }
 
 export default App;
+
+{/* <div className={`flex shrink-0 ${themeConfig[currentIndex].label === 'Night' ? 'text-slate-200/80' : 'text-slate-700/80'}`}>
+  <button popoverTarget="favourite-popover" 
+    className="flex shrink-0 items-center justify-center bg-teal-500 font-bold tracking-wider text-neutral-100 leading-5
+      px-3 py-1.5 md:px-4 md:py-2 rounded-md shadow-md/30 hover:bg-teal-500/80 hover:shadow-none
+      hover:translate-y-0.5 focus:translate-y-0.5 focus:shadow-none
+      uppercase"
+  >
+    <div className="flex justify-between text-sm lg:text-base">
+      <span className="hidden md:inline-flex mr-1">Favourite</span>
+      <BookHeart className="w-5 h-5 text-white"/>
+    </div>
+  </button>
+  <div id="favourite-popover" popover="auto" className="bg-transparent top-25 lg:top-20 -left-52 md:-left-44 lg:left-36 scale-55 md:scale-70 lg:scale-85 touch-auto">
+    <CryptoTable 
+      coins={coins.filter(coin => favourite.includes(coin.id))} 
+      historyData={sparkLineData}
+      trends={trends}
+      limit={favourite.length}
+      className="text-base md:text-xl"
+    />
+  </div>
+</div> */}

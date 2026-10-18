@@ -1,15 +1,18 @@
 import type { CryptoDataPoint } from '@/types/cryptoDataTypes';
+import { useState } from 'react';
 import { XAxis, YAxis, Line, LineChart, ResponsiveContainer, Tooltip } from 'recharts';
 
 interface SparkLineProps {
   data: CryptoDataPoint[];
   sparklineUrl?: string;
   className?: string;
-}
+};
 
 const SparkLine = ({ data, sparklineUrl, className = "" }: SparkLineProps) => {
   const sparklineClass = `h-10 w-24 ml-auto flex items-center justify-end overflow-visible z-50 ${className}`;
   const forIf = "w-full h-full object-contain";
+
+  const [isTooltipActive, setIsTooltipActive] = useState(false);
 
   if ( sparklineUrl ) {
     return (
@@ -31,7 +34,14 @@ const SparkLine = ({ data, sparklineUrl, className = "" }: SparkLineProps) => {
     <>
       <div className={`${sparklineClass}`}>
         <ResponsiveContainer width={96} height={40} >
-          <LineChart data={data} margin={{ top: 2, right: 0, bottom: 2, left: 0 }} >
+          <LineChart 
+            data={data} 
+            margin={{ top: 2, right: 0, bottom: 2, left: 0 }}
+            onMouseEnter={() => setIsTooltipActive(true)}
+            onMouseLeave={() => setIsTooltipActive(false)}
+            onTouchStart={() => setIsTooltipActive(true)}
+            onTouchEnd={() => setIsTooltipActive(false)}
+          >
             <XAxis dataKey="date" hide domain={['dataMin', 'dataMax']} />
             <YAxis hide domain={['dataMin', 'dataMax']} />
             <Line
@@ -43,10 +53,12 @@ const SparkLine = ({ data, sparklineUrl, className = "" }: SparkLineProps) => {
             />
             <Tooltip
               cursor={true}
+              active={isTooltipActive}
+              useTranslate3d={true}
               content={({ active, payload }) => {
                 if (!active || !payload?.length) return null;
                 return (
-                  <div className="bg-white/95 border border-slate-200 shadow-lg rounded-md px-2 py-1.5 text-xs text-slate-700/80">
+                  <div className="relative -top-15 pointer-events-none select-none bg-white/95 border border-slate-200 shadow-lg rounded-md px-2 py-1.5 text-xs text-slate-700/80">
                     <div className="font-medium text-slate-400 mb-1">
                       {new Date(payload[0].payload.date).toLocaleDateString("en-UK", { month: "short", day: "numeric" })}
                     </div>
