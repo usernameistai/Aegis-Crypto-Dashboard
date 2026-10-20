@@ -13,7 +13,10 @@ const trendSpark = "h-10 w-24 ml-auto object-contain";
 const CryptoRow = ({ coin, history, trend }: { coin: CryptoDataProps, history: CryptoDataPoint[], trend?: CryptoTrendsProps }) => {
   
   return (
-    <TableRow className='relative font-semibold tabular-nums hover:relative hover:z-50'>
+    <TableRow 
+      className='relative font-semibold tabular-nums hover:relative hover:z-50 select-none'
+      style={{ WebkitTapHighlightColor: 'transparent' }}
+    >
       <TableCell className={`${left} pl-2`}>
         <div className="flex items-center">
           <img src={coin.image} alt={coin.name} className='h-5 w-5 my-auto mr-2'/>
@@ -91,7 +94,7 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ coins, historyData, trends, l
               <TableHead className={right}>Last 7D</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody className='p-4 m-4 divide-y divide-slate-200/50'>
+          <TableBody className='p-4 m-4 divide-y divide-slate-200/50 select-none'>
             {coins.slice(0, limit).map((coin) => {
               const trend = trends.find((trend) => trend.id === coin.id);
 
