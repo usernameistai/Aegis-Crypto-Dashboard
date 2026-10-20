@@ -9,7 +9,7 @@ interface SparkLineProps {
 };
 
 const SparkLine = ({ data, sparklineUrl, className = "" }: SparkLineProps) => {
-  const sparklineClass = `h-10 w-24 ml-auto flex items-center justify-end overflow-visible z-50 ${className}`;
+  const sparklineClass = `h-10 w-24 ml-auto flex items-center justify-end overflow-visible z-50 select-none ${className}`;
   const forIf = "w-full h-full object-contain";
 
   const [isTooltipActive, setIsTooltipActive] = useState(false);
@@ -32,7 +32,10 @@ const SparkLine = ({ data, sparklineUrl, className = "" }: SparkLineProps) => {
   
   return (
     <>
-      <div className={`${sparklineClass}`}>
+      <div 
+        className={`${sparklineClass}`}
+        style={{ WebkitTapHighlightColor: "transparent" }}
+      >
         <ResponsiveContainer width={96} height={40} >
           <LineChart 
             data={data} 
@@ -58,7 +61,7 @@ const SparkLine = ({ data, sparklineUrl, className = "" }: SparkLineProps) => {
               content={({ active, payload }) => {
                 if (!active || !payload?.length) return null;
                 return (
-                  <div className="relative -top-15 pointer-events-none select-none bg-white/95 border border-slate-200 shadow-lg rounded-md px-2 py-1.5 text-xs text-slate-700/80">
+                  <div className="relative -top-15 pointer-events-none bg-white/95 border border-slate-200 shadow-lg rounded-md px-2 py-1.5 text-xs text-slate-700/80">
                     <div className="font-medium text-slate-400 mb-1">
                       {new Date(payload[0].payload.date).toLocaleDateString("en-UK", { month: "short", day: "numeric" })}
                     </div>
