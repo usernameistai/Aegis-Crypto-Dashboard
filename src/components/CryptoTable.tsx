@@ -14,8 +14,8 @@ const CryptoRow = ({ coin, history, trend }: { coin: CryptoDataProps, history: C
   
   return (
     <TableRow 
-      className='relative font-semibold tabular-nums hover:relative hover:z-50 select-none'
-      style={{ WebkitTapHighlightColor: 'transparent' }}
+      className='relative font-semibold tabular-nums hover:relative hover:z-50 select-none [-webkit-tap-highlight-color:transparent]'
+      // style={{ WebkitTapHighlightColor: 'transparent' }}
     >
       <TableCell className={`${left} pl-2`}>
         <div className="flex items-center">
