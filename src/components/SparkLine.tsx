@@ -32,10 +32,7 @@ const SparkLine = ({ data, sparklineUrl, className = "" }: SparkLineProps) => {
   
   return (
     <>
-      <div
-        className={`${sparklineClass} [-webkit-tap-highlight-color:transparent]`}
-        // style={{ WebkitTapHighlightColor: "transparent" }}
-      >
+      <div className={`${sparklineClass} [-webkit-tap-highlight-color:transparent]`} >
         <ResponsiveContainer width={96} height={40} >
           <LineChart 
             data={data} 

@@ -13,10 +13,7 @@ const trendSpark = "h-10 w-24 ml-auto object-contain";
 const CryptoRow = ({ coin, history, trend }: { coin: CryptoDataProps, history: CryptoDataPoint[], trend?: CryptoTrendsProps }) => {
   
   return (
-    <TableRow 
-      className='relative font-semibold tabular-nums hover:relative hover:z-50 select-none [-webkit-tap-highlight-color:transparent]'
-      // style={{ WebkitTapHighlightColor: 'transparent' }}
-    >
+    <TableRow className='relative font-semibold tabular-nums hover:relative hover:z-50 select-none [-webkit-tap-highlight-color:transparent]' >
       <TableCell className={`${left} pl-2`}>
         <div className="flex items-center">
           <img src={coin.image} alt={coin.name} className='h-5 w-5 my-auto mr-2'/>
