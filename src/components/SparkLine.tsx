@@ -36,7 +36,7 @@ const SparkLine = ({ data, sparklineUrl, className = "" }: SparkLineProps) => {
         className={`${sparklineClass}`}
         style={{ WebkitTapHighlightColor: "transparent" }}
       >
-        {/* <ResponsiveContainer width={96} height={40} >
+        <ResponsiveContainer width={96} height={40} >
           <LineChart 
             data={data} 
             margin={{ top: 2, right: 0, bottom: 2, left: 0 }}
@@ -44,6 +44,7 @@ const SparkLine = ({ data, sparklineUrl, className = "" }: SparkLineProps) => {
             onMouseLeave={() => setIsTooltipActive(false)}
             onTouchStart={() => setIsTooltipActive(true)}
             onTouchEnd={() => setIsTooltipActive(false)}
+            className='select-none'
           >
             <XAxis dataKey="date" hide domain={['dataMin', 'dataMax']} />
             <YAxis hide domain={['dataMin', 'dataMax']} />
@@ -75,8 +76,7 @@ const SparkLine = ({ data, sparklineUrl, className = "" }: SparkLineProps) => {
               }}
             />
           </LineChart>
-        </ResponsiveContainer> */}
-        Hello
+        </ResponsiveContainer>
       </div>
     </>
   )
