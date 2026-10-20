@@ -1,6 +1,6 @@
 import type { CryptoDataPoint } from '@/types/cryptoDataTypes';
-import { useState } from 'react';
-import { XAxis, YAxis, Line, LineChart, ResponsiveContainer, Tooltip } from 'recharts';
+// import { useState } from 'react';
+import { XAxis, YAxis, Line, LineChart, ResponsiveContainer } from 'recharts';
 
 interface SparkLineProps {
   data: CryptoDataPoint[];
@@ -12,7 +12,7 @@ const SparkLine = ({ data, sparklineUrl, className = "" }: SparkLineProps) => {
   const sparklineClass = `h-10 w-24 ml-auto flex items-center justify-end overflow-visible z-50 select-none ${className}`;
   const forIf = "w-full h-full object-contain";
 
-  const [isTooltipActive, setIsTooltipActive] = useState(false);
+  // const [isTooltipActive, setIsTooltipActive] = useState(false);
 
   if ( sparklineUrl ) {
     return (
@@ -40,10 +40,10 @@ const SparkLine = ({ data, sparklineUrl, className = "" }: SparkLineProps) => {
           <LineChart 
             data={data} 
             margin={{ top: 2, right: 0, bottom: 2, left: 0 }}
-            onMouseEnter={() => setIsTooltipActive(true)}
-            onMouseLeave={() => setIsTooltipActive(false)}
-            onTouchStart={() => setIsTooltipActive(true)}
-            onTouchEnd={() => setIsTooltipActive(false)}
+            // onMouseEnter={() => setIsTooltipActive(true)}
+            // onMouseLeave={() => setIsTooltipActive(false)}
+            // onTouchStart={() => setIsTooltipActive(true)}
+            // onTouchEnd={() => setIsTooltipActive(false)}
           >
             <XAxis dataKey="date" hide domain={['dataMin', 'dataMax']} />
             <YAxis hide domain={['dataMin', 'dataMax']} />
@@ -54,7 +54,7 @@ const SparkLine = ({ data, sparklineUrl, className = "" }: SparkLineProps) => {
               strokeWidth={2} 
               dot={false}
             />
-            <Tooltip
+            {/* <Tooltip
               cursor={true}
               active={isTooltipActive}
               useTranslate3d={true}
@@ -73,7 +73,7 @@ const SparkLine = ({ data, sparklineUrl, className = "" }: SparkLineProps) => {
                   </div>
                 );
               }}
-            />
+            /> */}
           </LineChart>
         </ResponsiveContainer>
       </div>
