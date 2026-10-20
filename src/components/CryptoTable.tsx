@@ -40,7 +40,7 @@ const CryptoRow = ({ coin, history, trend }: { coin: CryptoDataProps, history: C
       </TableCell>
       <TableCell className={`${right} ${hiddenTable}`}>{((coin.total_volume) / 1e9).toFixed(4)} B</TableCell>
       <TableCell className={`${right} ${(coin.market_cap_change_percentage_24h ?? 0) >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>{(coin.market_cap_change_percentage_24h ?? 0) >= 0 ? '▲' : '▼'} {coin.market_cap_change_percentage_24h ?? 0}%</TableCell>
-      <TableCell className={`${right} select-none`}>
+      <TableCell className={`${right}`}>
         {history && history.length > 0 
           ? <SparkLine data={history}/> 
           : trend?.data?.sparkline 
