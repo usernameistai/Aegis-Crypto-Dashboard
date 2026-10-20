@@ -32,8 +32,9 @@ const SparkLine = ({ data, sparklineUrl, className = "" }: SparkLineProps) => {
   
   return (
     <>
-      <div 
-        className={`${sparklineClass} outline-none focus:outline-none`}
+      <div
+        tabIndex={-1}
+        className={`${sparklineClass}`}
         style={{ WebkitTapHighlightColor: "transparent" }}
       >
         <ResponsiveContainer width={96} height={40} >
