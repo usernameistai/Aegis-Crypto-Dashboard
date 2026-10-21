@@ -1,13 +1,11 @@
 # Aegis Crypto Dashboard
 > **Status:** `OPERATIONAL` | **Market Clearance:** `BROKER_LEVEL_1`
 
-![React](https://shields.io)
-![Node](https://shields.io)
-![Database](https://shields.io)
-![Auth](https://shields.io)
-![TypeScript](https://shields.io)
-![Tailwind](https://shields.io)
-![TanStack](https://shields.io)
+![React](https://img.shields.io/badge/Frontend-React_19-61DAFB?logo=react)
+![Node](https://img.shields.io/badge/Backend-Node_22-339933?logo=nodedotjs)
+![TypeScript](https://img.shields.io/badge/Language-TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)
+![Tailwind](https://img.shields.io/badge/Styling-Tailwind_CSS-06B6D4?style=flat&logo=tailwindcss&logoColor=white)
+![TanStack](https://img.shields.io/badge/Caching-TanStack_Query-FF4154?style=flat&logo=reactquery&logoColor=white)
 
 A decentralized, multi-threaded intelligence node for intercepting, caching, and mapping high-frequency asset volatility. Features zero-latency session persistence and state-sync barriers engineered to withstand severe public-node throttling.
 
